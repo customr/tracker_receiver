@@ -45,6 +45,8 @@ def unpack_from_bytes(fmt, packet):
 	packet = binascii.a2b_hex(packet)
 	return struct.unpack(fmt, packet)
 
+
+
 def pack(packet):
 	return binascii.a2b_hex(packet)
 
@@ -53,5 +55,35 @@ def add_x(packet, letter, value):
 	packet = packet+new_part
 	return packet
 
+def add_str(packet, string):
+	if not isinstance(string, bytes): 
+		string = string.encode('ascii')
+		
+	return add_x(packet, f'{len(string)}s', string)
+
 def add_byte(packet, value):
 	return add_x(packet, 'b', value)
+
+def add_ubyte(packet, value):
+	return add_x(packet, 'B', value)
+
+def add_short(packet, value):
+	return add_x(packet, 'h', value)
+
+def add_ushort(packet, value):
+	return add_x(packet, 'H', value)
+
+def add_int(packet, value):
+	return add_x(packet, 'i', value)
+
+def add_uint(packet, value):
+	return add_x(packet, 'I', value)
+
+def add_longlong(packet, value):
+	return add_x(packet, 'q', value)
+
+def add_float(packet, value):
+	return add_x(packet, 'f', value)
+
+def add_double(packet, value):
+	return add_x(packet, 'd', value)
