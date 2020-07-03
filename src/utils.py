@@ -1,0 +1,57 @@
+import struct	
+import binascii
+
+
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+def extract(packet, length):
+	length *= 2
+	return packet[length:], packet[:length]
+
+def extract_x(packet, letter, length):
+	packet, extracted = extract(packet, length)
+	return packet, struct.unpack(f"!{letter}", binascii.a2b_hex(extracted))[0]
+
+def extract_byte(packet):
+	return extract_x(packet, 'b', 1)
+
+def extract_ubyte(packet):
+	return extract_x(packet, 'B', 1)
+
+def extract_short(packet):
+	return extract_x(packet, 'h', 2)
+
+def extract_ushort(packet):
+	return extract_x(packet, 'H', 2)
+
+def extract_int(packet):
+	return extract_x(packet, 'i', 4)
+ 
+def extract_uint(packet):
+	return extract_x(packet, 'I', 4)
+
+def extract_longlong(packet):
+	return extract_x(packet, 'q', 8)
+
+def extract_float(packet):
+	packet, extracted = extract_x(packet, 'f', 4)
+	return packet, round(extracted, 3)
+
+def extract_double(packet):
+	packet, extracted = extract_x(packet, 'd', 8)
+	return packet, round(extracted, 3)
+
+def unpack_from_bytes(fmt, packet):
+	packet = binascii.a2b_hex(packet)
+	return struct.unpack(fmt, packet)
+
+def pack(packet):
+	return binascii.a2b_hex(packet)
+
+def add_x(packet, letter, value):
+	new_part = binascii.hexlify(struct.pack(f'!{letter}', value)).decode('ascii')
+	packet = packet+new_part
+	return packet
+
+def add_byte(packet, value):
+	return add_x(packet, 'b', value)

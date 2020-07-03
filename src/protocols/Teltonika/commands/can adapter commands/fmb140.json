@@ -1,0 +1,8 @@
+{
+    "lvcanclear": 1,
+    "lvcangetinfo": 1,
+    "lvcangetprog": 1,
+    "lvcansetprog": 1,
+    "lvcansetting:#,#": 1,
+    "lvcansimpletacho": 1
+}

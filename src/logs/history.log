@@ -1,0 +1,120 @@
+INFO :: RETRANSLATOR START
+
+
+
+ 2020-07-02 10:08:04,374
+---------------
+INFO :: Teltonika 356307042441013 connected [None]
+ 2020-07-02 10:08:04,375
+---------------
+DEBUG :: [Teltonika] для 356307042441013 выбрана конфигурация fmb910
+ 2020-07-02 10:08:04,378
+---------------
+DEBUG :: [Teltonika] получен пакет с данными:
+b'000000000000005F10020000016BDBC7833000000000000000000000000000000000000B05040200010000030002000B00270042563A00000000016BDBC7871800000000000000000000000000000000000B05040200010000030002000B00260042563A00000200005FB3'
+ 2020-07-02 10:08:04,378
+---------------
+DEBUG :: [Teltonika] CODEC 16 AVL Data packet:
+b'0000016BDBC7833000000000000000000000000000000000000B05040200010000030002000B00270042563A00000000016BDBC7871800000000000000000000000000000000000B05040200010000030002000B00260042563A00000200005FB3'
+ 2020-07-02 10:08:04,379
+---------------
+DEBUG :: [Teltonika] AVL Data обработана:
+{'datetime': '2019-07-10 12:06:54', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0}
+ 2020-07-02 10:08:04,380
+---------------
+DEBUG :: [Teltonika] AVL IO Data обработана:
+{'Digital Input 1': 0, 'Digital Input 3': 0, 'ICCID1': 39, 'External Voltage': 22074}
+ 2020-07-02 10:08:04,380
+---------------
+DEBUG :: [Teltonika] Record #1:
+{'ts': '2020-07-02 10:08:04', 'datetime': '2019-07-10 12:06:54', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0, 'iodata': {'Digital Input 1': 0, 'Digital Input 3': 0, 'ICCID1': 39, 'External Voltage': 22074}}
+ 2020-07-02 10:08:04,381
+---------------
+DEBUG :: [Teltonika] CODEC 16 AVL Data packet:
+b'0000016BDBC7871800000000000000000000000000000000000B05040200010000030002000B00260042563A00000200005FB3'
+ 2020-07-02 10:08:04,381
+---------------
+DEBUG :: [Teltonika] AVL Data обработана:
+{'datetime': '2019-07-10 12:06:55', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0}
+ 2020-07-02 10:08:04,382
+---------------
+DEBUG :: [Teltonika] AVL IO Data обработана:
+{'Digital Input 1': 0, 'Digital Input 3': 0, 'ICCID1': 38, 'External Voltage': 22074}
+ 2020-07-02 10:08:04,382
+---------------
+DEBUG :: [Teltonika] Record #2:
+{'ts': '2020-07-02 10:08:04', 'datetime': '2019-07-10 12:06:55', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0, 'iodata': {'Digital Input 1': 0, 'Digital Input 3': 0, 'ICCID1': 38, 'External Voltage': 22074}}
+ 2020-07-02 10:08:04,383
+---------------
+INFO :: [Teltonika] Record #1 AVL IO Data преобразована:
+{'ignition': 0, 'sensor': 0}
+ 2020-07-02 10:08:04,384
+---------------
+INFO :: [Teltonika] Record #2 AVL IO Data преобразована:
+{'ignition': 0, 'sensor': 0}
+ 2020-07-02 10:08:04,384
+---------------
+DEBUG :: [Teltonika] result:
+[{'ts': '2020-07-02 10:08:04', 'datetime': '2019-07-10 12:06:54', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0, 'iodata': {'ignition': 0, 'sensor': 0}, 'imei': 356307042441013}, {'ts': '2020-07-02 10:08:04', 'datetime': '2019-07-10 12:06:55', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0, 'iodata': {'ignition': 0, 'sensor': 0}, 'imei': 356307042441013}]
+ 2020-07-02 10:08:04,385
+---------------
+INFO :: RETRANSLATOR START
+
+
+
+ 2020-07-02 10:18:47,214
+---------------
+INFO :: Teltonika 356307042441013 connected [None]
+ 2020-07-02 10:18:47,215
+---------------
+DEBUG :: [Teltonika] для 356307042441013 выбрана конфигурация fmb910
+ 2020-07-02 10:18:47,217
+---------------
+DEBUG :: [Teltonika] получен пакет с данными:
+b'000000000000005F10020000016BDBC7833000000000000000000000000000000000000B05040200010000030002000B00270042563A00000000016BDBC7871800000000000000000000000000000000000B05040200010000030002000B00260042563A00000200005FB3'
+ 2020-07-02 10:18:47,218
+---------------
+DEBUG :: [Teltonika] CODEC 16 AVL Data packet:
+b'0000016BDBC7833000000000000000000000000000000000000B05040200010000030002000B00270042563A00000000016BDBC7871800000000000000000000000000000000000B05040200010000030002000B00260042563A00000200005FB3'
+ 2020-07-02 10:18:47,218
+---------------
+DEBUG :: [Teltonika] AVL Data обработана:
+{'datetime': '2019-07-10 12:06:54', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0}
+ 2020-07-02 10:18:47,219
+---------------
+DEBUG :: [Teltonika] AVL IO Data обработана:
+{'Digital Input 1': 0, 'Digital Input 3': 0, 'ICCID1': 39, 'External Voltage': 22074}
+ 2020-07-02 10:18:47,220
+---------------
+DEBUG :: [Teltonika] Record #1:
+{'ts': '2020-07-02 10:18:47', 'datetime': '2019-07-10 12:06:54', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0, 'iodata': {'Digital Input 1': 0, 'Digital Input 3': 0, 'ICCID1': 39, 'External Voltage': 22074}}
+ 2020-07-02 10:18:47,220
+---------------
+DEBUG :: [Teltonika] CODEC 16 AVL Data packet:
+b'0000016BDBC7871800000000000000000000000000000000000B05040200010000030002000B00260042563A00000200005FB3'
+ 2020-07-02 10:18:47,221
+---------------
+DEBUG :: [Teltonika] AVL Data обработана:
+{'datetime': '2019-07-10 12:06:55', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0}
+ 2020-07-02 10:18:47,221
+---------------
+DEBUG :: [Teltonika] AVL IO Data обработана:
+{'Digital Input 1': 0, 'Digital Input 3': 0, 'ICCID1': 38, 'External Voltage': 22074}
+ 2020-07-02 10:18:47,222
+---------------
+DEBUG :: [Teltonika] Record #2:
+{'ts': '2020-07-02 10:18:47', 'datetime': '2019-07-10 12:06:55', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0, 'iodata': {'Digital Input 1': 0, 'Digital Input 3': 0, 'ICCID1': 38, 'External Voltage': 22074}}
+ 2020-07-02 10:18:47,222
+---------------
+INFO :: [Teltonika] Record #1 AVL IO Data преобразована:
+{'ignition': 0, 'sensor': 0}
+ 2020-07-02 10:18:47,223
+---------------
+INFO :: [Teltonika] Record #2 AVL IO Data преобразована:
+{'ignition': 0, 'sensor': 0}
+ 2020-07-02 10:18:47,224
+---------------
+DEBUG :: [Teltonika] result:
+[{'ts': '2020-07-02 10:18:47', 'datetime': '2019-07-10 12:06:54', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0, 'iodata': {'ignition': 0, 'sensor': 0}, 'imei': 356307042441013}, {'ts': '2020-07-02 10:18:47', 'datetime': '2019-07-10 12:06:55', 'lon': 0.0, 'lat': 0.0, 'alt': 0, 'direction': 0, 'sat_num': 0, 'speed': 0, 'iodata': {'ignition': 0, 'sensor': 0}, 'imei': 356307042441013}]
+ 2020-07-02 10:18:47,224
+---------------

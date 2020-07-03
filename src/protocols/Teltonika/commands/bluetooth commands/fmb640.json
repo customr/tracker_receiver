@@ -1,0 +1,7 @@
+{
+    "btgetlist": 1,
+    "btrelease": 1,
+    "btscan": 1,
+    "btunpair": 1,
+    "btvisible": 1
+}

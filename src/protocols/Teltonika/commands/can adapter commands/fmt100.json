@@ -1,0 +1,15 @@
+{
+    "allcanmode": 1,
+    "lvcanclear": 1,
+    "lvcanclosealldoors": 1,
+    "lvcanfaultcodes": 1,
+    "lvcangetinfo": 1,
+    "lvcangetprog": 1,
+    "lvcanmode": 1,
+    "lvcanopenalldoors": 1,
+    "lvcanopentrunk": 1,
+    "lvcansetprog": 1,
+    "lvcansetting:#,#": 1,
+    "lvcansimpletacho": 1,
+    "lvcanturninglights": 1
+}
