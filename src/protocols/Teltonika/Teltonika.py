@@ -22,6 +22,7 @@ class TeltonikaServer:
 		self.sock.bind((self.ip, int(self.port)))
 		self.sock.listen(1024)
 
+		if self.ip=='': self.ip = 'any'
 		logger.info(f'Сервер для Teltonika запущен - [{self.ip}:{self.port}]\n')
 		
 		listen_th = threading.Thread(target=self.connecter)
@@ -31,6 +32,7 @@ class TeltonikaServer:
 	def connecter(self):
 		while True:
 			conn, addr = self.sock.accept()
+			logger.debug(f'[Teltonika] попытка подсоединиться {addr}\n')
 			Teltonika(conn, addr)
 
 
@@ -89,18 +91,19 @@ class Teltonika:
 			return decoder
 
 		else:
-			logger.critical(f"Teltonika для imei {self.imei} AVL IDs не найдены\n")
+			logger.critical(f"Teltonika для imei {self.imei} конфигурация не найдена\n")
 			raise ValueError('Unknown tracker')
 
 
 	def handle_imei(self):
-		#packet = binascii.hexlify(self.sock.recv(34))
-		packet = b'000F333536333037303432343431303133'
+		packet = binascii.hexlify(self.sock.recv(34))
 		length = int(packet[:4], 16)
 		packet = unpack_from_bytes(f'{length}s', packet[4:])[0]
-		#self.sock.send(struct.pack('!B', 1))
-
-		return packet.decode('ascii')
+		imei = packet.decode('ascii')
+		logger.debug(f'[Teltonika] imei получен {imei}\n')
+		self.sock.send(struct.pack('!B', 1))
+		logger.debug(f'[Teltonika] ответ на сообщение с imei отправлен\n')
+		return imei
 
 
 	def handle_data(self):
@@ -138,9 +141,7 @@ class Teltonika:
 			all_data.append(data)
 			logger.debug(f"[Teltonika] #{len(all_data)}:\n{data}\n")
 
-		#self.sock.send(struct.pack("!I", len(all_data)))
-		#self.sock.close()
-
+		self.sock.send(struct.pack("!I", len(all_data)))
 		return packet, all_data
 
 
@@ -258,6 +259,7 @@ class Teltonika:
 
 	def codec_12(self, command):
 		pass
+
 
 	def codec_13(self, command):
 		pass
