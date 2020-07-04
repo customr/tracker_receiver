@@ -22,7 +22,7 @@ class TeltonikaServer:
 		self.sock.bind((self.ip, int(self.port)))
 		self.sock.listen(1024)
 
-		if self.ip=='': self.ip = 'any'
+		if self.ip=='': self.ip = 'ANY'
 		logger.info(f'Сервер для Teltonika запущен - [{self.ip}:{self.port}]\n')
 		
 		listen_th = threading.Thread(target=self.connecter)
@@ -33,7 +33,6 @@ class TeltonikaServer:
 		while True:
 			conn, addr = self.sock.accept()
 			logger.debug(f'[Teltonika] попытка подсоединиться {addr}\n')
-			th = threading.Thread(target=Teltonika,)
 			Teltonika(conn, addr)
 
 
@@ -143,16 +142,16 @@ class Teltonika:
 			logger.debug(f"[Teltonika] #{len(all_data)}:\n{data}\n")
 
 		for n, rec in enumerate(all_data):
-			iodata = {}
 			for name, x in self.assign.items():
 				value = 0
 				if name in rec['iodata'].keys():
 					value = rec['iodata'][name]
+					del(rec['iodata'][name])
 
-				iodata.update({x: value})
+				rec['iodata'].update({x: value})
 
+			rec.update({"imei": int(self.imei)})
 			logger.info(f"[Teltonika] Record #{n+1} AVL IO Data преобразована:\n{iodata}\n")
-			rec.update({"iodata": iodata, "imei": int(self.imei)})
 
 		logger.debug(f'[Teltonika] data:\n{all_data}\n')
 		logger.info(f'Teltonika {self.imei} получено {len(all_data)} записей')
