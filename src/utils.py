@@ -26,14 +26,13 @@ class TrackerServer:
 		if self.ip=='': self.ip = 'ANY'
 		logger.info(f'Сервер для {protocol.NAME} запущен - [{self.ip}:{self.port}]\n')
 		
-		listen_th = threading.Thread(target=self.connecter)
+		listen_th = threading.Thread(target=self.connecter, args=(protocol,))
 		listen_th.start()
 
 
-	def connecter(self):
+	def connecter(self, protocol):
 		while True:
 			conn, addr = self.sock.accept()
-			logger.debug(f'[{protocol.NAME}] попытка подсоединиться {addr}\n')
 			protocol(conn, addr)
 
 
