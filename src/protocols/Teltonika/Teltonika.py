@@ -33,6 +33,7 @@ class TeltonikaServer:
 		while True:
 			conn, addr = self.sock.accept()
 			logger.debug(f'[Teltonika] попытка подсоединиться {addr}\n')
+			th = threading.Thread(target=Teltonika,)
 			Teltonika(conn, addr)
 
 
@@ -45,33 +46,20 @@ class Teltonika:
 		self.addr = addr
 
 		self.imei = self.handle_imei()
-		logger.info(f'Teltonika {self.imei} connected [{addr}]\n')
-
+		logger.info(f'Teltonika {self.imei} подключен[{addr}]\n')
 		self.decoder = self.get_decoder()
-		packet, self.data = self.handle_data()
-
-		packet, NumOfData_2 = extract_ubyte(packet)
-		packet, crc16 = extract_uint(packet)
-
-		if len(packet)!=0:
-			logger.error(f'[Teltonika] дешифрованы не все данные:\n{packet}\n')
-
-		assign = load(open(self.BASE_PATH+f'configurations/{self.imei}.json', 'r'))
 		
-		for n, rec in enumerate(self.data):
-			iodata = {}
-			for name, x in assign.items():
-				value = 0
-				if name in rec['iodata'].keys():
-					value = rec['iodata'][name]
 
-				iodata.update({x: value})
+		conf_path = self.BASE_PATH+f'configurations/{self.imei}.json'
+		if not os.path.exists(conf_path):
+			logger.error(f'[Teltonika] конфигурация для {self.imei} не найдена\n')
+			raise ValueError('Configuration not found')
 
-			logger.info(f"[Teltonika] Record #{n+1} AVL IO Data преобразована:\n{iodata}\n")
-			rec.update({"iodata": iodata, "imei": int(self.imei)})
-
-		logger.debug(f'[Teltonika] result:\n{self.data}\n')
-		logger.info(f'Teltonika {self.imei} received {len(self.data)} records')
+		else:
+			self.assign = load(open(conf_path, 'r'))
+	
+		main_th = threading.Thread(target=self.handle_packet)
+		main_th.start()
 
 
 	def get_decoder(self):
@@ -106,16 +94,29 @@ class Teltonika:
 		return imei
 
 
-	def handle_data(self):
-		all_data = []
-		#packet = binascii.hexlify(self.sock.recv(4096))
-		packet = b'000000000000005F10020000016BDBC7833000000000000000000000000000000000000B05040200010000030002000B00270042563A00000000016BDBC7871800000000000000000000000000000000000B05040200010000030002000B00260042563A00000200005FB3'
-		logger.debug(f'[Teltonika] получен пакет с данными:\n{packet}\n')
-		packet, _ = extract_int(packet) #preamble zero bytes
-		packet, data_len = extract_uint(packet)
-		packet, self.codec = extract_ubyte(packet)
-		packet, count = extract_ubyte(packet)
+	def handle_packet(self):
+		while True:
+			packet = binascii.hexlify(self.sock.recv(4096))
+			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
+			packet, _ = extract_int(packet) #preamble zero bytes
+			packet, data_len = extract_uint(packet)
+			packet, self.codec = extract_ubyte(packet)
+			packet, count = extract_ubyte(packet)
 		
+
+			if self.codec in (8, 142, 16):
+				self.data = self.handle_data(packet)
+			
+			elif self.codec in (12, 13, 14):
+				self.data = self.handle_command(packet)
+
+			else:
+				logger.critical(f"Teltonika неизвестный кодек {self.codec}")
+				raise ValueError('Unknown codec')
+
+
+	def handle_data(self, packet):
+		all_data = []
 		codec_func = None
 
 		#codec 8
@@ -141,8 +142,26 @@ class Teltonika:
 			all_data.append(data)
 			logger.debug(f"[Teltonika] #{len(all_data)}:\n{data}\n")
 
+		for n, rec in enumerate(all_data):
+			iodata = {}
+			for name, x in self.assign.items():
+				value = 0
+				if name in rec['iodata'].keys():
+					value = rec['iodata'][name]
+
+				iodata.update({x: value})
+
+			logger.info(f"[Teltonika] Record #{n+1} AVL IO Data преобразована:\n{iodata}\n")
+			rec.update({"iodata": iodata, "imei": int(self.imei)})
+
+		logger.debug(f'[Teltonika] data:\n{all_data}\n')
+		logger.info(f'Teltonika {self.imei} получено {len(all_data)} записей')
 		self.sock.send(struct.pack("!I", len(all_data)))
-		return packet, all_data
+		return all_data
+
+
+	def handle_command(self, packet):
+		pass
 
 
 	def codec_8(self, packet):
@@ -192,6 +211,9 @@ class Teltonika:
 
 		packet, iodata = self.handle_io(packet)
 		data.update({"iodata": iodata})
+
+		packet, NumOfData_2 = extract_ubyte(packet)
+		packet, crc16 = extract_uint(packet)
 
 		logger.debug(f'[Teltonika] AVL IO Data обработана:\n{iodata}\n')
 
@@ -257,13 +279,13 @@ class Teltonika:
 		return packet, data
 
 
-	def codec_12(self, command):
+	def codec_12(self, command=None):
 		pass
 
 
-	def codec_13(self, command):
+	def codec_13(self, command=None):
 		pass
 
 
-	def codec_14(self, command):
+	def codec_14(self, command=None):
 		pass
