@@ -13,7 +13,7 @@ from src.logs.log_config import logger
 
 class TeltonikaServer:
 	def __init__(self):
-		p = os.path.join('src/', 'servers.json')
+		p = os.path.join('tracker_receiver/src/', 'servers.json')
 		with open(p, 'r') as s:
 			protocol = load(s)
 
@@ -39,7 +39,7 @@ class TeltonikaServer:
 
 class Teltonika:
 
-	BASE_PATH = 'src/protocols/Teltonika/'
+	BASE_PATH = 'tracker_receiver/src/protocols/Teltonika/'
 
 	def __init__(self, sock, addr):
 		self.sock = sock
@@ -52,7 +52,7 @@ class Teltonika:
 
 		conf_path = self.BASE_PATH+f'configurations/{self.imei}.json'
 		if not os.path.exists(conf_path):
-			logger.error(f'[Teltonika] конфигурация для {self.imei} не найдена\n')
+			logger.error(f'[Teltonika] для {self.imei} конфигурация не найдена\n')
 			raise ValueError('Configuration not found')
 
 		else:
@@ -75,11 +75,11 @@ class Teltonika:
 
 		if model:
 			decoder = load(open(self.BASE_PATH+f'avl_ids/{model}.json', 'r'))
-			logger.debug(f"[Teltonika] для {self.imei} выбрана конфигурация {model}\n")
+			logger.debug(f"[Teltonika] для {self.imei} выбрана модель {model}\n")
 			return decoder
 
 		else:
-			logger.critical(f"Teltonika для imei {self.imei} конфигурация не найдена\n")
+			logger.critical(f"Teltonika для imei {self.imei} модель не найдена\n")
 			raise ValueError('Unknown tracker')
 
 
@@ -101,7 +101,7 @@ class Teltonika:
 			packet, _ = extract_int(packet) #preamble zero bytes
 			packet, data_len = extract_uint(packet)
 			packet, self.codec = extract_ubyte(packet)
-			packet, count = extract_ubyte(packet)
+			packet, self.count = extract_ubyte(packet)
 		
 
 			if self.codec in (8, 142, 16):
@@ -135,7 +135,7 @@ class Teltonika:
 			logger.critical(f"Teltonika неизвестный кодек {self.codec}")
 			raise ValueError('Unknown codec')
 
-		for rec in range(count):
+		for rec in range(self.count):
 			data = {'ts': datetime.datetime.now().strftime(DATETIME_FORMAT)}
 			packet, codecdata = codec_func(packet)
 			data.update(codecdata)
@@ -266,7 +266,11 @@ class Teltonika:
 			for _ in range(count):
 				packet, io_id = extract_ushort(packet)
 				packet, length = extract_ushort(packet)
-				packet, io_val = extract_x(packet, 'q', length)
+				
+				if length>8:
+					packet, un_val = extract(packet, length)
+				else:
+					packet, io_val = extract_x(packet, 'q', length)
 
 				if str(io_id) not in self.decoder.keys():
 					logger.error(f'[Teltonika] Неизвестный AVL IO ID {io_id}\n')
