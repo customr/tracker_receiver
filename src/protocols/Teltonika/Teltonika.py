@@ -212,9 +212,6 @@ class Teltonika:
 		packet, iodata = self.handle_io(packet)
 		data.update({"iodata": iodata})
 
-		packet, NumOfData_2 = extract_ubyte(packet)
-		packet, crc16 = extract_uint(packet)
-
 		logger.debug(f'[Teltonika] AVL IO Data обработана:\n{iodata}\n')
 
 		return packet, data
@@ -266,7 +263,7 @@ class Teltonika:
 			for _ in range(count):
 				packet, io_id = extract_ushort(packet)
 				packet, length = extract_ushort(packet)
-				
+
 				if length>8:
 					packet, un_val = extract(packet, length)
 				else:
