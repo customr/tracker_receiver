@@ -4,6 +4,8 @@ import threading
 import struct	
 import binascii
 
+from json import load
+
 from src.logs.log_config import logger
 
 
@@ -14,9 +16,9 @@ class TrackerServer:
 	def __init__(self, protocol):
 		p = os.path.join('tracker_receiver/src/', 'servers.json')
 		with open(p, 'r') as s:
-			protocol = load(s)
+			servers = load(s)
 
-		self.ip, self.port = protocol[protocol.NAME.lower()].split(':')
+		self.ip, self.port = servers[protocol.NAME.lower()].split(':')
 		self.sock = socket.socket()
 		self.sock.bind((self.ip, int(self.port)))
 		self.sock.listen(1024)
