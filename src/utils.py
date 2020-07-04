@@ -4,6 +4,32 @@ import binascii
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
+
+class TrackerServer:
+	def __init__(self, protocol):
+		p = os.path.join('tracker_receiver/src/', 'servers.json')
+		with open(p, 'r') as s:
+			protocol = load(s)
+
+		self.ip, self.port = protocol[protocol.NAME.lower()].split(':')
+		self.sock = socket.socket()
+		self.sock.bind((self.ip, int(self.port)))
+		self.sock.listen(1024)
+
+		if self.ip=='': self.ip = 'ANY'
+		logger.info(f'Сервер для {protocol.NAME} запущен - [{self.ip}:{self.port}]\n')
+		
+		listen_th = threading.Thread(target=self.connecter)
+		listen_th.start()
+
+
+	def connecter(self):
+		while True:
+			conn, addr = self.sock.accept()
+			logger.debug(f'[{protocol.NAME}] попытка подсоединиться {addr}\n')
+			protocol(conn, addr)
+
+
 def extract(packet, length):
 	length *= 2
 	return packet[length:], packet[:length]

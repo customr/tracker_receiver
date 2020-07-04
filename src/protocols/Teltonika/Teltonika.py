@@ -11,34 +11,10 @@ from src.utils import *
 from src.logs.log_config import logger
 
 
-class TeltonikaServer:
-	def __init__(self):
-		p = os.path.join('tracker_receiver/src/', 'servers.json')
-		with open(p, 'r') as s:
-			protocol = load(s)
-
-		self.ip, self.port = protocol['teltonika'].split(':')
-		self.sock = socket.socket()
-		self.sock.bind((self.ip, int(self.port)))
-		self.sock.listen(1024)
-
-		if self.ip=='': self.ip = 'ANY'
-		logger.info(f'Сервер для Teltonika запущен - [{self.ip}:{self.port}]\n')
-		
-		listen_th = threading.Thread(target=self.connecter)
-		listen_th.start()
-
-
-	def connecter(self):
-		while True:
-			conn, addr = self.sock.accept()
-			logger.debug(f'[Teltonika] попытка подсоединиться {addr}\n')
-			Teltonika(conn, addr)
-
-
 class Teltonika:
 
 	BASE_PATH = 'tracker_receiver/src/protocols/Teltonika/'
+	NAME = 'Teltonika'
 
 	def __init__(self, sock, addr):
 		self.sock = sock
@@ -151,7 +127,7 @@ class Teltonika:
 				rec['iodata'].update({x: value})
 
 			rec.update({"imei": int(self.imei)})
-			logger.info(f"[Teltonika] Record #{n+1} AVL IO Data преобразована:\n{iodata}\n")
+			logger.info(f"[Teltonika] Record #{n+1} AVL IO Data преобразована\n")
 
 		logger.debug(f'[Teltonika] data:\n{all_data}\n')
 		logger.info(f'Teltonika {self.imei} получено {len(all_data)} записей')
