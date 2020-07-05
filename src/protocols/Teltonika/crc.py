@@ -13,7 +13,3 @@ def crc16(buff, crc =0, poly = 0xa001):
 			uc += 1
 		i += 1
 	return crc
-
-import struct
-import binascii
-print(hex(crc16(struct.unpack('15s', binascii.a2b_hex(b'0C010500000007676574696E666F01'))[0])))

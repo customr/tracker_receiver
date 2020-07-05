@@ -167,7 +167,7 @@ class Teltonika:
 
 		packet = add_str(packet, command)
 		packet = add_ubyte(packet, 1)
-		crc16_pack = struct.unpack('15s', binascii.a2b_hex(packet[8:].encode('ascii')))[0]
+		crc16_pack = struct.unpack('15s', binascii.a2b_hex(packet[16:].encode('ascii')))[0]
 		packet = add_uint(packet, crc16(crc16_pack))
 		logger.debug(f'[Teltonika] командный пакет сформирован:\n{packet}\n')
 		packet = pack(packet)
@@ -228,11 +228,11 @@ class Teltonika:
 		packet, _ = extract_ubyte(packet)
 		packet, length = extract_uint(packet)
 
-		if codec==14:
+		if self.codec==14:
 			packet, imei = extract_str(packet, 8)
 			length -= 8
 
-		elif codec==13:
+		elif self.codec==13:
 			packet, ts = extract(packet, 8)
 			ts = int(b'0x'+timestamp, 16)
 			ts /= 1000
