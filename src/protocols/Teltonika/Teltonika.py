@@ -5,6 +5,7 @@ import socket
 import threading
 import datetime
 
+from time import time
 from json import load
 
 from src.utils import *
@@ -87,6 +88,11 @@ class Teltonika:
 			if self.codec in (8, 142, 16):
 				self.data = self.handle_data(packet)
 
+			elif self.codec in (12, 13, 14):
+				result = self.handle_command(packet)
+				with open(self.BASE_PATH+'result.txt', 'w') as res:
+					res.write(result)
+
 			else:
 				logger.critical(f"Teltonika неизвестный кодек {self.codec}")
 				raise ValueError('Unknown codec')
@@ -114,11 +120,7 @@ class Teltonika:
 					logger.debug(msg)
 					command_fd.close()
 					open(command_path, 'w').close()
-					result = self.send_command(imei, codec, command)
-
-					with open(result_path, 'w') as res:
-						res.write(result)
-
+					self.send_command(imei, codec, command)
 					self.lock.release()
 
 				except Exception as e:
@@ -168,10 +170,6 @@ class Teltonika:
 		packet = pack(packet)
 		self.sock.send(packet)
 		logger.debug(f'[Teltonika] команда отправлена\n')
-		rec_packet = self.sock.recv(4096)
-		rec_packet = binascii.hexlify(rec_packet)
-		logger.debug(f'[Teltonika] ответ на команду получен:\n{rec_packet}\n')
-		return self.handle_command(rec_packet)
 
 
 	def handle_data(self, packet):
@@ -195,7 +193,7 @@ class Teltonika:
 			raise ValueError('Unknown codec')
 
 		for rec in range(self.count):
-			data = {'ts': datetime.datetime.utcfromtimestamp(datetime.datetime.now())}
+			data = {'ts': datetime.datetime.utcfromtimestamp(int(time()))}
 			packet, codecdata = codec_func(packet)
 			data.update(codecdata)
 			all_data.append(data)
@@ -220,10 +218,6 @@ class Teltonika:
 
 
 	def handle_command(self, packet):
-		packet, _ = extract_int(packet)
-		packet, _ = extract_uint(packet)
-		packet, codec = extract_ubyte(packet)
-		packet, _ = extract_ubyte(packet)
 		packet, _ = extract_ubyte(packet)
 		packet, length = extract_uint(packet)
 
