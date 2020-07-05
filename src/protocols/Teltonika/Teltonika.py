@@ -9,7 +9,7 @@ from json import load
 
 from src.utils import *
 from src.logs.log_config import logger
-from crc import crc16
+from src.protocols.Teltonika.crc import crc16
 
 
 class Teltonika:
@@ -100,24 +100,36 @@ class Teltonika:
 		while True:
 			if os.path.getsize(command_path)>0:
 				self.lock.acquire()
-				command_file = open(command_path, 'r').read()
-				imei, codec = command_file.split(' ')[:2]
+				try:
+					command_fd = open(command_path, 'r')
+					command_file = command_fd.read()
+					imei, codec = command_file.split(' ')[:2]
 
-				if imei!=self.imei: 
+					if imei!=self.imei: 
+						self.lock.release()
+						continue
+
+					command = command_file.split('"')[1]
+					msg = f'[Teltonika] команда дешифрована:\nimei={imei}\ncodec={codec}\ncommand={command}\n'
+					logger.debug(msg)
+					command_fd.close()
+					open(command_path, 'w').close()
+					result = self.send_command(imei, codec, command)
+
+					with open(result_path, 'w') as res:
+						res.write(result)
+
+					self.lock.release()
+
+				except Exception as e:
+					logger.error(f'Teltinika ошибка в обработке команды:\n{e}\n')
+					open(command_path, 'w').close()
+
+					with open(result_path, 'w') as res:
+						res.write(f'Ошибка в обработке команды:\n{e}\n')
+
 					self.lock.release()
 					continue
-
-				command = command_file.split('"')[1]
-				msg = f'[Teltonika] команда дешифрована:\nimei={imei}\ncodec={codec}\ncommand={command}\n'
-				logger.debug(msg)
-				command_file.close()
-				open(command_path, 'w').close()
-				result = self.send_command(imei, codec, command)
-
-				with open(result_path, 'w') as res:
-					res.write(result)
-
-				self.lock.release()
 
 
 	def send_command(self, imei, codec, command):
@@ -125,11 +137,9 @@ class Teltonika:
 
 		if codec==12:
 			length = 8+len(command)
-			codec_func = self.codec_12_pack
 
 		elif codec==14:
-			length = 8+len(command)+len(imei)
-			codec_func = self.codec_14_pack
+			length = 16+len(command)
 
 		elif codec==13:
 			result = 'Сервер не может отправлять команду по кодеку 13!'
@@ -149,14 +159,16 @@ class Teltonika:
 		if codec==14:
 			packet = add_str(packet, imei.rjust(15, '0'))
 
-		packet.add_str(packet, command)
+		packet = add_str(packet, command)
 		packet = add_ubyte(packet, 1)
-		packet = add_uint(packet, crc16(packet[16:]))
+		packet = add_uint(packet, crc16(packet[8:]))
 		logger.debug(f'[Teltonika] командный пакет сформирован:\n{packet}\n')
 		packet = pack(packet)
 		self.sock.send(packet)
 		logger.debug(f'[Teltonika] команда отправлена\n')
 		rec_packet = self.sock.recv(4096)
+		rec_packet = binascii.hexlify(rec_packet)
+		logger.debug(f'[Teltonika] ответ на команду получен:\n{rec_packet}\n')
 		return self.handle_command(rec_packet)
 
 
@@ -206,25 +218,25 @@ class Teltonika:
 
 
 	def handle_command(self, packet):
-		packet, _ = packet.extract_int(packet)
-		packet, _ = packet.extract_uint(packet)
-		packet, codec = packet.extract_ubyte(packet)
-		packet, _ = packet.extract_ubyte(packet)
-		packet, _ = packet.extract_ubyte(packet)
-		packet, length = packet.extract_uint(packet)
+		packet, _ = extract_int(packet)
+		packet, _ = extract_uint(packet)
+		packet, codec = extract_ubyte(packet)
+		packet, _ = extract_ubyte(packet)
+		packet, _ = extract_ubyte(packet)
+		packet, length = extract_uint(packet)
 
 		if codec==14:
-			packet, imei = packet.extract_str(packet, 8)
+			packet, imei = extract_str(packet, 8)
 			length -= 8
 
 		elif codec==13:
 			packet, ts = extract(packet, 8)
 			ts = int(b'0x'+timestamp, 16)
 			ts /= 1000
-			
-		packet, response = packet.extract_str(packet, length)
-		packet, _ = packet.extract_ubyte(packet)
-		packet, _ = packet.extract_uint(packet)
+
+		packet, response = extract_str(packet, length)
+		packet, _ = extract_ubyte(packet)
+		packet, _ = extract_uint(packet)
 		return response.decode('ascii')
 
 
