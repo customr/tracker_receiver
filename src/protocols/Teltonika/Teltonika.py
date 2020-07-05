@@ -125,6 +125,7 @@ class Teltonika:
 
 				except Exception as e:
 					logger.error(f'Teltinika ошибка в обработке команды:\n{e}\n')
+					command_fd.close()
 					open(command_path, 'w').close()
 
 					with open(result_path, 'w') as res:
@@ -156,6 +157,7 @@ class Teltonika:
 		packet = ''
 		packet = add_int(packet, 0)
 		packet = add_uint(packet, length)
+		packet = add_ubyte(packet, codec)
 		packet = add_ubyte(packet, 1)
 		packet = add_ubyte(packet, 5)
 		packet = add_uint(packet, com_length)
@@ -165,11 +167,16 @@ class Teltonika:
 
 		packet = add_str(packet, command)
 		packet = add_ubyte(packet, 1)
-		packet = add_uint(packet, crc16(packet[8:]))
+		crc16_pack = struct.unpack('15s', binascii.a2b_hex(packet[8:].encode('ascii')))[0]
+		packet = add_uint(packet, crc16(crc16_pack))
 		logger.debug(f'[Teltonika] командный пакет сформирован:\n{packet}\n')
 		packet = pack(packet)
 		self.sock.send(packet)
 		logger.debug(f'[Teltonika] команда отправлена\n')
+
+		if result:
+			with open(self.BASE_PATH+'result.txt', 'w') as res:
+				res.write(result)
 
 
 	def handle_data(self, packet):
@@ -193,7 +200,7 @@ class Teltonika:
 			raise ValueError('Unknown codec')
 
 		for rec in range(self.count):
-			data = {'ts': datetime.datetime.utcfromtimestamp(int(time()))}
+			data = {'ts': datetime.datetime.utcfromtimestamp(int(time())).strftime(DATETIME_FORMAT)}
 			packet, codecdata = codec_func(packet)
 			data.update(codecdata)
 			all_data.append(data)
