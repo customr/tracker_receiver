@@ -8,7 +8,7 @@ import datetime
 from json import load
 
 from src.utils import *
-from src.protocols.Teltonika.logs.log_config import logger
+from src.logs.log_config import logger
 from src.protocols.Teltonika.crc import crc16
 
 
@@ -136,10 +136,12 @@ class Teltonika:
 		result = ''
 		codec = int(codec)
 		if codec==12:
-			length = len(command)
+			com_length = len(command)
+			length = 8+com_length
 
 		elif codec==14:
-			length = 8+len(command)
+			com_length = 8+len(command)
+			length = 8+com_length
 
 		elif codec==13:
 			result = 'Сервер не может отправлять команду по кодеку 13!'
@@ -151,13 +153,13 @@ class Teltonika:
 
 		packet = ''
 		packet = add_int(packet, 0)
-		packet = add_uint(packet, 8+length)
+		packet = add_uint(packet, length)
 		packet = add_ubyte(packet, 1)
 		packet = add_ubyte(packet, 5)
-		packet = add_uint(packet, length)
+		packet = add_uint(packet, com_length)
 
 		if codec==14:
-			packet = add_str(packet, imei.rjust(15, '0'))
+			packet = add_str(packet, imei.rjust(16, '0'))
 
 		packet = add_str(packet, command)
 		packet = add_ubyte(packet, 1)
