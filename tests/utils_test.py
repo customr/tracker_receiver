@@ -43,6 +43,21 @@ class ExtractTest(unittest.TestCase):
 				self.assertEqual(value, values[n])
 
 
+	def test_str(self):
+		s = 'abc'
+		packet = hexlify(struct.pack("!3s", s.encode('ascii')))
+		_, test_s  = extract_str(packet, 3)
+		self.assertEqual(test_s.decode('ascii'), s)
+
+
+	def test_str_pack(self):
+		s = 'abc'
+		packet = ''
+		packet = add_str(packet, s)
+		packet = pack(packet)
+		self.assertEqual(packet.decode('ascii'), s)
+
+
 	def test_byte(self):
 		value = 5
 		test_packet = struct.pack("!B", value)

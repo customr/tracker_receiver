@@ -9,6 +9,7 @@ from json import load
 
 from src.utils import *
 from src.logs.log_config import logger
+from crc import crc16
 
 
 class Teltonika:
@@ -32,7 +33,10 @@ class Teltonika:
 
 		else:
 			self.assign = load(open(conf_path, 'r'))
-	
+		
+		self.lock = threading.Lock()
+		waiter_th = threading.Thread(target=self.wait_command)
+		waiter_th.start()
 		main_th = threading.Thread(target=self.handle_packet)
 		main_th.start()
 
@@ -72,6 +76,7 @@ class Teltonika:
 	def handle_packet(self):
 		while True:
 			packet = binascii.hexlify(self.sock.recv(4096))
+			self.lock.acquire()
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
 			packet, _ = extract_int(packet) #preamble zero bytes
 			packet, data_len = extract_uint(packet)
@@ -81,13 +86,78 @@ class Teltonika:
 
 			if self.codec in (8, 142, 16):
 				self.data = self.handle_data(packet)
-			
-			elif self.codec in (12, 13, 14):
-				self.data = self.handle_command(packet)
 
 			else:
 				logger.critical(f"Teltonika неизвестный кодек {self.codec}")
 				raise ValueError('Unknown codec')
+
+			self.lock.release()
+
+
+	def wait_command(self):
+		command_path = self.BASE_PATH+'command.txt'
+		result_path =  self.BASE_PATH+'result.txt'
+		while True:
+			if os.path.getsize(command_path)>0:
+				self.lock.acquire()
+				command_file = open(command_path, 'r').read()
+				imei, codec = command_file.split(' ')[:2]
+
+				if imei!=self.imei: 
+					self.lock.release()
+					continue
+
+				command = command_file.split('"')[1]
+				msg = f'[Teltonika] команда дешифрована:\nimei={imei}\ncodec={codec}\ncommand={command}\n'
+				logger.debug(msg)
+				command_file.close()
+				open(command_path, 'w').close()
+				result = self.send_command(imei, codec, command)
+
+				with open(result_path, 'w') as res:
+					res.write(result)
+
+				self.lock.release()
+
+
+	def send_command(self, imei, codec, command):
+		result = ''
+
+		if codec==12:
+			length = 8+len(command)
+			codec_func = self.codec_12_pack
+
+		elif codec==14:
+			length = 8+len(command)+len(imei)
+			codec_func = self.codec_14_pack
+
+		elif codec==13:
+			result = 'Сервер не может отправлять команду по кодеку 13!'
+			return result
+
+		else:
+			result = f'Неизвестный кодек - {codec}'
+			return result
+
+		packet = ''
+		packet = add_int(packet, 0)
+		packet = add_uint(packet, length)
+		packet = add_ubyte(packet, 1)
+		packet = add_ubyte(packet, 5)
+		packet = add_uint(packet, length)
+
+		if codec==14:
+			packet = add_str(packet, imei.rjust(15, '0'))
+
+		packet.add_str(packet, command)
+		packet = add_ubyte(packet, 1)
+		packet = add_uint(packet, crc16(packet[16:]))
+		logger.debug(f'[Teltonika] командный пакет сформирован:\n{packet}\n')
+		packet = pack(packet)
+		self.sock.send(packet)
+		logger.debug(f'[Teltonika] команда отправлена\n')
+		rec_packet = self.sock.recv(4096)
+		return self.handle_command(rec_packet)
 
 
 	def handle_data(self, packet):
@@ -136,7 +206,26 @@ class Teltonika:
 
 
 	def handle_command(self, packet):
-		pass
+		packet, _ = packet.extract_int(packet)
+		packet, _ = packet.extract_uint(packet)
+		packet, codec = packet.extract_ubyte(packet)
+		packet, _ = packet.extract_ubyte(packet)
+		packet, _ = packet.extract_ubyte(packet)
+		packet, length = packet.extract_uint(packet)
+
+		if codec==14:
+			packet, imei = packet.extract_str(packet, 8)
+			length -= 8
+
+		elif codec==13:
+			packet, ts = extract(packet, 8)
+			ts = int(b'0x'+timestamp, 16)
+			ts /= 1000
+			
+		packet, response = packet.extract_str(packet, length)
+		packet, _ = packet.extract_ubyte(packet)
+		packet, _ = packet.extract_uint(packet)
+		return response.decode('ascii')
 
 
 	def codec_8(self, packet):
@@ -254,14 +343,3 @@ class Teltonika:
 
 		return packet, data
 
-
-	def codec_12(self, command=None):
-		pass
-
-
-	def codec_13(self, command=None):
-		pass
-
-
-	def codec_14(self, command=None):
-		pass

@@ -1,4 +1,4 @@
-from src.utils import TrackerServer
+from src.server import TrackerServer
 from src.protocols.Teltonika import Teltonika
 
 
