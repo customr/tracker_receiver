@@ -103,6 +103,7 @@ class Teltonika:
 	def wait_command(self):
 		command_path = self.BASE_PATH+'command.txt'
 		result_path =  self.BASE_PATH+'result.txt'
+		error_c = 0
 		while True:
 			if os.path.getsize(command_path)>0:
 				self.lock.acquire()
@@ -121,18 +122,20 @@ class Teltonika:
 					command_fd.close()
 					open(command_path, 'w').close()
 					self.send_command(imei, codec, command)
-					self.lock.release()
+					error_c = 0
 
 				except Exception as e:
-					logger.error(f'Teltinika ошибка в обработке команды:\n{e}\n')
+					error_c += 1
+					logger.error(f'Teltinika ошибка в обработке команды:\n{e}\nПопытка={error_c}\n')
 					command_fd.close()
-					open(command_path, 'w').close()
+					
+					if error_c>1:
+						open(command_path, 'w').close()
 
 					with open(result_path, 'w') as res:
 						res.write(f'Ошибка в обработке команды:\n{e}\n')
 
-					self.lock.release()
-					continue
+				self.lock.release()
 
 
 	def send_command(self, imei, codec, command):
@@ -167,7 +170,7 @@ class Teltonika:
 
 		packet = add_str(packet, command)
 		packet = add_ubyte(packet, 1)
-		crc16_pack = struct.unpack('15s', binascii.a2b_hex(packet[16:].encode('ascii')))[0]
+		crc16_pack = struct.unpack(f'{len(packet[16:])//2}s', binascii.a2b_hex(packet[16:].encode('ascii')))[0]
 		packet = add_uint(packet, crc16(crc16_pack))
 		logger.debug(f'[Teltonika] командный пакет сформирован:\n{packet}\n')
 		packet = pack(packet)
@@ -240,6 +243,7 @@ class Teltonika:
 		packet, response = extract_str(packet, length)
 		packet, _ = extract_ubyte(packet)
 		packet, _ = extract_uint(packet)
+		logger.debug(f'[Teltonika] пакет с ответом на команду распакован\n')
 		return response.decode('ascii')
 
 
