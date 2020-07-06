@@ -1,6 +1,7 @@
 import pymysql
 
 from json import loads
+from contextlib import closing
 
 from src.db_connect import CONN, RECORDS_TABLE
 
