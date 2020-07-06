@@ -1,5 +1,7 @@
 import pymysql
 
+from json import loads
+
 from src.db_connect import CONN, RECORDS_TABLE
 
 
@@ -19,7 +21,7 @@ def get_configuration_and_model(imei):
 	with connection.cursor() as cursor:
 		cursor.execute(query)
 		x = cursor.fetchone()
-		params = x['params']
+		params = loads(x['params'])
 		model = x['model']
 
 	return params, model

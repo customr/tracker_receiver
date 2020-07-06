@@ -8,7 +8,7 @@ conf = {
 	"Digital Input 1": "ignition",
 	"Digital Input 2": "sensor"
 }
-
+conf = str(conf).replace("'", '"')
 connection = pymysql.connect(**CONN)
 
 try:
