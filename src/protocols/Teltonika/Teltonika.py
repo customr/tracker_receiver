@@ -200,7 +200,6 @@ class Teltonika:
 
 		for n, rec in enumerate(all_data):
 			for name, x in self.assign.items():
-				value = 0
 				if name in rec['iodata'].keys():
 					value = rec['iodata'][name]
 
@@ -213,7 +212,9 @@ class Teltonika:
 
 						rec['iodata'].update({'ignition': value})
 
-					rec['iodata'].update({x: value})
+					else:
+						rec['iodata'].update({x: value})
+					
 					del(rec['iodata'][name])
 
 			rec.update({"imei": int(self.imei)})
@@ -369,6 +370,12 @@ class Teltonika:
 				reserve += r'\"'+key+r'\":'+str(value)+','
 
 			reserve = reserve[:-1]
+
+			if not data['iodata'].get('ignition', None):
+				data['iodata'].update({"ignition": 0})
+
+			if not data['iodata'].get('sensor', None):
+				data['iodata'].update({"sensor": 0})
 
 			geo = {
 				'imei': data['imei'],
