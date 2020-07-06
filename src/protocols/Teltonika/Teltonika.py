@@ -262,7 +262,7 @@ class Teltonika:
 		packet, speed = extract_ushort(packet)
 
 		dt = datetime.datetime.utcfromtimestamp(timestamp)
-		dt = dt.strftime(DATETIME_FORMAT)
+		dt = dt.timestamp()
 		data = {
 			"datetime": dt,
 			"lon": lon,
@@ -365,17 +365,14 @@ class Teltonika:
 	def prepare_geo(self, records):
 		all_geo = []
 		for data in records:
-			reserve = ''
-			for key, value in data['iodata'].items():
-				reserve += r'\"'+key+r'\":'+str(value)+','
-
-			reserve = reserve[:-1]
-
 			if not data['iodata'].get('ignition', None):
 				data['iodata'].update({"ignition": 0})
 
 			if not data['iodata'].get('sensor', None):
 				data['iodata'].update({"sensor": 0})
+
+			reserve = str(data['iodata']).replace("'", '"')
+			reserve = reserve[1:-1]
 
 			geo = {
 				'imei': data['imei'],
@@ -389,8 +386,7 @@ class Teltonika:
 				'fuel': 0,
 				'ignition': data['iodata']['ignition'],
 				'sensor': data['iodata']['sensor'],
-				'reserve': reserve,
-				'ts': data['ts']
+				'reserve': reserve
 			}
 
 			all_geo.append(geo)

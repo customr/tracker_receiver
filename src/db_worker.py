@@ -30,8 +30,11 @@ def get_configuration_and_model(imei):
 def insert_geo(data):
 	for rec in data:
 		query = f'INSERT INTO `{RECORDS_TABLE}` VALUES ('
-		for value in rec.values():
-			query += f'{value},'
+		for name, value in rec.items():
+			if name=='reserve':
+				query += f"'{value}',"
+			else:
+				query += f"{value},"
 
 		query = query[:-1]
 		query += ')'
