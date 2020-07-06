@@ -49,7 +49,8 @@ def insert_geo(data):
 					cursor.execute(query)
 					count += 1
 				except Exception as e:
-					logger.info(f'Ошибка в mysql insert запросе {e}')
+					with open('src/logs/errors.log', 'a') as fd:
+						fd.write(f'Ошибка в mysql insert запросе {e}')
 
 			connection.commit()
 

@@ -73,7 +73,8 @@ class Teltonika:
 			if self.codec in (8, 142, 16):
 				self.data = self.handle_data(packet)
 				self.data = self.prepare_geo(self.data)
-				insert_geo(self.data)
+				count = insert_geo(self.data)
+				logger.info(f'Teltonika {self.imei} отправлено в базу: {count} записей\n')
 
 			elif self.codec in (12, 13, 14):
 				result = self.handle_command(packet)
