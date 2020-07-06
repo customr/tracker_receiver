@@ -1,9 +1,6 @@
 import pymysql
 
-from copy import deepcopy
-from contextlib import closing
-
-from db_connect import CONN, RECORDS_TABLE
+from src.db_connect import CONN, RECORDS_TABLE
 
 
 connection = pymysql.connect(**CONN)
