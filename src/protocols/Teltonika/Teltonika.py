@@ -192,7 +192,7 @@ class Teltonika:
 			raise ValueError('Unknown codec')
 
 		for rec in range(self.count):
-			data = {'ts': datetime.datetime.utcfromtimestamp(int(time())).strftime(DATETIME_FORMAT)}
+			data = {'ts': datetime.datetime.utcfromtimestamp(int(time()))}
 			packet, codecdata = codec_func(packet)
 			data.update(codecdata)
 			all_data.append(data)
@@ -262,7 +262,6 @@ class Teltonika:
 		packet, speed = extract_ushort(packet)
 
 		dt = datetime.datetime.utcfromtimestamp(timestamp)
-		dt = dt.timestamp()
 		data = {
 			"datetime": dt,
 			"lon": lon,
@@ -371,6 +370,7 @@ class Teltonika:
 			if not data['iodata'].get('sensor', None):
 				data['iodata'].update({"sensor": 0})
 
+			data['iodata'].update({"sat_num": data['sat_num']})
 			reserve = str(data['iodata']).replace("'", '"')
 			reserve = reserve[1:-1]
 
@@ -386,7 +386,8 @@ class Teltonika:
 				'fuel': 0,
 				'ignition': data['iodata']['ignition'],
 				'sensor': data['iodata']['sensor'],
-				'reserve': reserve
+				'reserve': reserve,
+				'ts': data['ts']
 			}
 
 			all_geo.append(geo)

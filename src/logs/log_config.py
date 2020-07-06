@@ -3,7 +3,7 @@ import sys
 from logging.handlers import RotatingFileHandler
 
 PATH = "tracker_receiver/src/logs/history.log"
-LEVEL = logging.DEBUG
+LEVEL = logging.INFO
 frt = logging.Formatter('%(levelname)s :: %(message)s %(asctime)s\n'+'-'*15)
 
 logger = logging.getLogger()

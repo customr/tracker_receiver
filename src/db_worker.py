@@ -31,7 +31,7 @@ def insert_geo(data):
 	for rec in data:
 		query = f'INSERT INTO `{RECORDS_TABLE}` VALUES ('
 		for name, value in rec.items():
-			if name=='reserve':
+			if name in ('datetime', 'reserve', 'ts'):
 				query += f"'{value}',"
 			else:
 				query += f"{value},"
