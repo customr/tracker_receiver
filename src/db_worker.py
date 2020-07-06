@@ -25,8 +25,18 @@ def get_configuration_and_model(imei):
 		with connection.cursor() as cursor:
 			cursor.execute(query)
 			x = cursor.fetchone()
-			params = loads(x['params'])
-			model = x['model']
+			if not isinstance(x, dict):
+				with open('src/protocols/Teltonika/default_config.json', 'r') as fdL
+					params = load(fd)
+					model = ''
+
+				query = f"INSERT INTO `trackers_config` VALUES ({int(imei)}, '{model}', '{params}')"
+				cursor.execute(query)
+				connection.commit()
+
+			else:
+				params = loads(x['params'])
+				model = x['model']
 
 		return params, model
 
@@ -49,7 +59,7 @@ def insert_geo(data):
 					cursor.execute(query)
 					count += 1
 				except Exception as e:
-					with open('src/logs/errors.log', 'a') as fd:
+					with open('logs/errors.log', 'a') as fd:
 						fd.write(f'Ошибка в mysql insert запросе {e}')
 
 			connection.commit()
