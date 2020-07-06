@@ -376,8 +376,8 @@ class Teltonika:
 
 			geo = {
 				'imei': data['imei'],
-				'lat': data['lat'],
-				'lon': data['lon'],
+				'lat': float({:.6f}.format(data['lat'])),
+				'lon': float({:.6f}.format(data['lon'])),
 				'datetime': data['datetime'],
 				'type': 0,
 				'speed': data['speed'],
