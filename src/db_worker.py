@@ -4,6 +4,8 @@ from json import loads
 
 from src.db_connect import CONN, RECORDS_TABLE
 
+GEO_COLUMNS = '`imei`,`lat`,`lon`,`datetime`,`type`,`speed`,`direction`,`bat`,`fuel`,'
+GEO_COLUMNS += '`ignition`,`sensor`,`reserve`, `ts`'
 
 connection = pymysql.connect(**CONN)
 
@@ -29,7 +31,7 @@ def get_configuration_and_model(imei):
 
 def insert_geo(data):
 	for rec in data:
-		query = f'INSERT INTO `{RECORDS_TABLE}` VALUES ('
+		query = f'INSERT INTO `{RECORDS_TABLE}` ({GEO_COLUMNS}) VALUES ('
 		for name, value in rec.items():
 			if name in ('datetime', 'reserve', 'ts'):
 				query += f"'{value}',"

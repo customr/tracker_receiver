@@ -346,7 +346,7 @@ class Teltonika:
 				packet, length = extract_ushort(packet)
 
 				if length>8:
-					packet, un_val = extract(packet, length)
+					packet, io_val = extract(packet, length)
 				else:
 					packet, io_val = extract_x(packet, 'q', length)
 
