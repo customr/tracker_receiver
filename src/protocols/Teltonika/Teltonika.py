@@ -9,6 +9,7 @@ from time import time
 from json import load
 
 from src.utils import *
+from src.db_worker import *
 from src.logs.log_config import logger
 from src.protocols.Teltonika.crc import crc16
 
@@ -24,38 +25,24 @@ class Teltonika:
 
 		self.imei = self.handle_imei()
 		logger.info(f'Teltonika {self.imei} подключен[{addr}]\n')
-		self.decoder = self.get_decoder()
-		
 
-		conf_path = self.BASE_PATH+f'configurations/{self.imei}.json'
-		if not os.path.exists(conf_path):
-			logger.error(f'[Teltonika] для {self.imei} конфигурация не найдена\n')
-			raise ValueError('Configuration not found')
-
-		else:
-			self.assign = load(open(conf_path, 'r'))
+		self.assign, self.model = get_configuration_and_model(self.imei)
+		self.decoder = self.get_decoder(self.model)
+		self.ign_v = get_ignition_v(self.imei)
 		
 		self.lock = threading.Lock()
 		waiter_th = threading.Thread(target=self.wait_command)
-		waiter_th.start()
 		main_th = threading.Thread(target=self.handle_packet)
+		waiter_th.start()
 		main_th.start()
 
 
-	def get_decoder(self):
+	def get_decoder(self, model):
 		listdir = os.listdir(self.BASE_PATH+'configurations')
-
-		with open(self.BASE_PATH+'configurations/trackers.json', 'r') as fd:
-			trackers = load(fd)
-			model = None
-
-			if self.imei in trackers.keys():
-				model = trackers[self.imei]
-
-
+		
 		if model:
-			decoder = load(open(self.BASE_PATH+f'avl_ids/{model}.json', 'r'))
-			logger.debug(f"[Teltonika] для {self.imei} выбрана модель {model}\n")
+			decoder = load(open(self.BASE_PATH+f'avl_ids/{model.lower()}.json', 'r'))
+			logger.debug(f"[Teltonika] для {self.imei} выбрана модель {model.lower()}\n")
 			return decoder
 
 		else:
@@ -87,6 +74,8 @@ class Teltonika:
 
 			if self.codec in (8, 142, 16):
 				self.data = self.handle_data(packet)
+				self.data = self.prepare_geo(self.data)
+				insert_geo(self.data)
 
 			elif self.codec in (12, 13, 14):
 				result = self.handle_command(packet)
@@ -213,12 +202,22 @@ class Teltonika:
 
 		for n, rec in enumerate(all_data):
 			for name, x in self.assign.items():
-				value = 0
 				if name in rec['iodata'].keys():
 					value = rec['iodata'][name]
-					del(rec['iodata'][name])
 
-				rec['iodata'].update({x: value})
+					if name=='External Voltage':
+						if self.ign_v is not None:
+							if value>self.ign_v:
+								value = 1
+							else:
+								value = 0
+
+						rec['iodata'].update({'ignition': value})
+
+					else:
+						rec['iodata'].update({x: value})
+					
+					del(rec['iodata'][name])
 
 			rec.update({"imei": int(self.imei)})
 			logger.debug(f"[Teltonika] Record #{n+1} AVL IO Data преобразована\n")
@@ -364,3 +363,32 @@ class Teltonika:
 
 		return packet, data
 
+
+	def prepare_geo(self, records):
+		all_geo = []
+		for data in records:
+			reserve = ''
+			for key, value in data['iodata'].items():
+				reserve += r'\"'+key+r'\":'+str(value)+','
+
+			reserve = reserve[:-1]
+
+			geo = {
+				'imei': data['imei'],
+				'lat': data['lat'],
+				'lon': data['lon'],
+				'datetime': data['datetime'],
+				'type': 0,
+				'speed': data['speed'],
+				'direction': data['direction'],
+				'bat': 0,
+				'fuel': 0,
+				'ignition': data['iodata']['ignition'],
+				'sensor': data['iodata']['sensor'],
+				'reserve': reserve,
+				'ts': data['ts']
+			}
+
+			all_geo.append(geo)
+
+		return all_geo
