@@ -93,6 +93,8 @@ class Teltonika:
 				with open(self.BASE_PATH+'result.txt', 'w') as res:
 					res.write(result)
 
+				logger.info(f'[Teltonika] ответ на команду принят\n')
+
 			else:
 				logger.critical(f"Teltonika неизвестный кодек {self.codec}")
 				raise ValueError('Unknown codec')
@@ -126,7 +128,7 @@ class Teltonika:
 
 				except Exception as e:
 					error_c += 1
-					logger.error(f'Teltinika ошибка в обработке команды:\n{e}\nПопытка={error_c}\n')
+					logger.error(f'Teltonika ошибка в обработке команды:\n{e}\nПопытка={error_c}\n')
 					command_fd.close()
 					
 					if error_c>1:
@@ -219,7 +221,7 @@ class Teltonika:
 				rec['iodata'].update({x: value})
 
 			rec.update({"imei": int(self.imei)})
-			logger.info(f"[Teltonika] Record #{n+1} AVL IO Data преобразована\n")
+			logger.debug(f"[Teltonika] Record #{n+1} AVL IO Data преобразована\n")
 
 		logger.debug(f'[Teltonika] data:\n{all_data}\n')
 		logger.info(f'Teltonika {self.imei} получено {len(all_data)} записей')
