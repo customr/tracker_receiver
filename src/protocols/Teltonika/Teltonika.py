@@ -38,8 +38,6 @@ class Teltonika:
 
 
 	def get_decoder(self, model):
-		listdir = os.listdir(self.BASE_PATH+'configurations')
-		
 		if model:
 			decoder = load(open(self.BASE_PATH+f'avl_ids/{model.lower()}.json', 'r'))
 			logger.debug(f"[Teltonika] для {self.imei} выбрана модель {model.lower()}\n")
