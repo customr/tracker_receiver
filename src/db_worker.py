@@ -1,6 +1,6 @@
 import pymysql
 
-from json import loads
+from json import loads, load
 from contextlib import closing
 
 from src.db_connect import CONN, RECORDS_TABLE
@@ -26,9 +26,9 @@ def get_configuration_and_model(imei):
 			cursor.execute(query)
 			x = cursor.fetchone()
 			if not isinstance(x, dict):
-				with open('src/protocols/Teltonika/default_config.json', 'r') as fdL
+				with open('tracker_receiver/src/protocols/Teltonika/default_config.json', 'r') as fd:
 					params = load(fd)
-					model = ''
+					model = 'fmb910'
 
 				query = f"INSERT INTO `trackers_config` VALUES ({int(imei)}, '{model}', '{params}')"
 				cursor.execute(query)
@@ -59,8 +59,8 @@ def insert_geo(data):
 					cursor.execute(query)
 					count += 1
 				except Exception as e:
-					with open('logs/errors.log', 'a') as fd:
-						fd.write(f'Ошибка в mysql insert запросе {e}')
+					with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
+						fd.write(f'Ошибка в mysql insert запросе {e}\n')
 
 			connection.commit()
 
