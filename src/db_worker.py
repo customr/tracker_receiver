@@ -21,7 +21,7 @@ def get_ignition_v(imei):
 
 def get_configuration_and_model(imei):
 	with closing(pymysql.connect(**CONN)) as connection:
-		query = f'SELECT `params`, `model` from `trackers_config` WHERE `imei`={int(imei)}'
+		query = f'SELECT `params`, `model` from `teltonika_config` WHERE `imei`={int(imei)}'
 		with connection.cursor() as cursor:
 			cursor.execute(query)
 			x = cursor.fetchone()
@@ -30,7 +30,7 @@ def get_configuration_and_model(imei):
 					params = load(fd)
 					model = 'fmb910'
 
-				query = f"INSERT INTO `trackers_config` VALUES ({int(imei)}, '{model}', '{params}')"
+				query = f"INSERT INTO `teltonika_config` VALUES ({int(imei)}, '{model}', '{params}')"
 				cursor.execute(query)
 				connection.commit()
 

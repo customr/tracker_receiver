@@ -193,33 +193,45 @@ class Teltonika:
 			raise ValueError('Unknown codec')
 
 		for rec in range(self.count):
-			data = {'ts': datetime.datetime.utcfromtimestamp(int(time()))}
+			data = {
+				'imei': self.imei,
+				'ts': datetime.datetime.utcfromtimestamp(int(time()))
+			}
+
 			packet, codecdata = codec_func(packet)
 			data.update(codecdata)
+
+			if 'voltage' in data['iodata'].keys():
+				if self.ign_v is not None:
+					if data['iodata']['voltage']>self.ign_v:
+ 						data['iodata']['ignition'] = 1
+ 					else:
+ 						data['iodata']['ignition'] = 0
+
 			all_data.append(data)
 			logger.debug(f"[Teltonika] #{len(all_data)}:\n{data}\n")
 
-		for n, rec in enumerate(all_data):
-			for name, x in self.assign.items():
-				if name in rec['iodata'].keys():
-					value = rec['iodata'][name]
+		# for n, rec in enumerate(all_data):
+		# 	for name, x in self.assign.items():
+		# 		if name in rec['iodata'].keys():
+		# 			value = rec['iodata'][name]
 
-					if name=='External Voltage':
-						if self.ign_v is not None:
-							if value>self.ign_v:
-								value = 1
-							else:
-								value = 0
+		# 			if name=='External Voltage':
+		# 				if self.ign_v is not None:
+		# 					if value>self.ign_v:
+		# 						value = 1
+		# 					else:
+		# 						value = 0
 
-						rec['iodata'].update({'ignition': value})
+		# 					rec['iodata'].update({'ignition': value})
+		# 					del(rec['iodata'][name])
+		# 					continue
 
-					else:
-						rec['iodata'].update({x: value})
-					
-					del(rec['iodata'][name])
+		# 			rec['iodata'].update({x: value})
+		# 			del(rec['iodata'][name])
 
-			rec.update({"imei": int(self.imei)})
-			logger.debug(f"[Teltonika] Record #{n+1} AVL IO Data преобразована\n")
+		# 	rec.update({"imei": int(self.imei)})
+		# 	logger.debug(f"[Teltonika] Record #{n+1} AVL IO Data преобразована\n")
 
 		logger.debug(f'[Teltonika] data:\n{all_data}\n')
 		logger.info(f'Teltonika {self.imei} получено {len(all_data)} записей')
@@ -355,7 +367,14 @@ class Teltonika:
 					logger.error(f'[Teltonika] Неизвестный AVL IO ID {io_id}\n')
 
 				else:
-					iodata.update({self.decoder[str(io_id)]: io_val})
+					if str(io_id) in self.assign.keys():
+						iodata.update({self.assign[str(io_id)]: io_val})
+
+					elif self.decoder[str(io_id)] in self.assign.keys():
+						iodata.update({self.assign[self.decoder[str(io_id)]]: io_val})
+
+					else:
+						iodata.update({self.decoder[str(io_id)]: io_val})
 
 			data.update(iodata)
 
