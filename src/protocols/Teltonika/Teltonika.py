@@ -23,8 +23,10 @@ class Teltonika:
 		self.sock = sock
 		self.addr = addr
 
+	
+	def start(self):
 		self.imei = self.handle_imei()
-		logger.info(f'Teltonika {self.imei} подключен[{addr}]\n')
+		logger.info(f'Teltonika {self.imei} подключен[{self.addr}]\n')
 
 		self.assign, self.model = get_configuration_and_model(self.imei)
 		self.decoder = self.get_decoder(self.model)
@@ -61,7 +63,11 @@ class Teltonika:
 
 	def handle_packet(self):
 		while True:
-			packet = binascii.hexlify(self.sock.recv(4096))
+			try:
+				packet = binascii.hexlify(self.sock.recv(4096))
+			except Exception:
+				break
+
 			self.lock.acquire()
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
 			packet, _ = extract_int(packet) #preamble zero bytes
@@ -204,9 +210,9 @@ class Teltonika:
 			if 'voltage' in data['iodata'].keys():
 				if self.ign_v is not None:
 					if data['iodata']['voltage']>self.ign_v:
- 						data['iodata']['ignition'] = 1
- 					else:
- 						data['iodata']['ignition'] = 0
+						data['iodata']['ignition'] = 1
+					else:
+						data['iodata']['ignition'] = 0
 
 			all_data.append(data)
 			logger.debug(f"[Teltonika] #{len(all_data)}:\n{data}\n")

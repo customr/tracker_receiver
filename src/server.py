@@ -28,3 +28,4 @@ class TrackerServer:
 		while True:
 			conn, addr = self.sock.accept()
 			protocol(conn, addr)
+			threading.Thread(target=protocol.start).start()
