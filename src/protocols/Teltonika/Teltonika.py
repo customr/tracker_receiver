@@ -74,7 +74,7 @@ class Teltonika:
 				self.data = self.handle_data(packet)
 				self.data = self.prepare_geo(self.data)
 				count = insert_geo(self.data)
-				logger.info(f'Teltonika из них безошибочных: {count} записей')
+				logger.debug(f'Teltonika из них безошибочных: {count} записей')
 
 			elif self.codec in (12, 13, 14):
 				result = self.handle_command(packet)
@@ -345,7 +345,14 @@ class Teltonika:
 					logger.error(f'[Teltonika] Неизвестный AVL IO ID {io_id}\n')
 
 				else:
-					iodata.update({self.decoder[str(io_id)]: io_val})
+					if str(io_id) in self.assign.keys():
+						iodata.update({self.assign[str(io_id)]: io_val})
+
+					elif self.decoder[str(io_id)] in self.assign.keys():
+						iodata.update({self.assign[self.decoder[str(io_id)]]: io_val})
+
+					else:
+						iodata.update({self.decoder[str(io_id)]: io_val})
 
 			data.update(iodata)
 		

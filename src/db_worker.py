@@ -30,7 +30,8 @@ def get_configuration_and_model(imei):
 					params = load(fd)
 					model = 'fmb910'
 
-				query = f"INSERT INTO `teltonika_config` VALUES ({int(imei)}, '{model}', '{params}')"
+				ins_params = str(params).replace("'", '"')
+				query = f"INSERT INTO `teltonika_config` VALUES ({int(imei)}, '{model}', '{ins_params}')"
 				cursor.execute(query)
 				connection.commit()
 
