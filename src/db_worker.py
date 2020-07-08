@@ -28,7 +28,7 @@ def get_configuration_and_model(imei):
 			if not isinstance(x, dict):
 				with open('tracker_receiver/src/protocols/Teltonika/default_config.json', 'r') as fd:
 					params = load(fd)
-					model = 'fmb910'
+					model = 'fmb920'
 
 				ins_params = str(params).replace("'", '"')
 				query = f"INSERT INTO `teltonika_config` VALUES ({int(imei)}, '{model}', '{ins_params}')"

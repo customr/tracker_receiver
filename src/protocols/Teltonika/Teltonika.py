@@ -78,6 +78,11 @@ class Teltonika:
 				self.stop = True
 				break
 
+			if len(packet)==0:
+				self.sock.close()
+				self.stop = True
+				break
+				
 			self.lock.acquire()
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
 			packet, _ = extract_int(packet) #preamble zero bytes
@@ -304,9 +309,12 @@ class Teltonika:
 			logger.critical(f"Teltonika неизвестный кодек {self.codec}\n")
 			raise ValueError('Unknown codec')
 
-		packet, iodata = self.handle_io(packet)
-		data.update({"iodata": iodata})
+		if EventIO==385:
+			packet, iodata = self.handle_beacon(packet)
+		else:
+			packet, iodata = self.handle_io(packet)
 
+		data.update({"iodata": iodata})
 		logger.debug(f'[Teltonika] AVL IO Data обработана:\n{iodata}\n')
 
 		return packet, data
@@ -424,3 +432,15 @@ class Teltonika:
 			all_geo.append(geo)
 
 		return all_geo
+
+
+	def handle_beacon(self, packet):
+		packet, _ = extract_short(packet)
+		packet, _ = extract_short(packet)
+		packet, _ = extract_short(packet)
+		packet, _ = extract_short(packet)
+		packet, _ = extract_short(packet)
+		packet, length = extract_short(packet)
+		packet, beacon = extract(packet, length)
+
+		return {"Beacon": beacon}
