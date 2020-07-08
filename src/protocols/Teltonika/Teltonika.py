@@ -52,13 +52,20 @@ class Teltonika:
 
 
 	def handle_imei(self):
-		packet = binascii.hexlify(self.sock.recv(34))
-		length = int(packet[:4], 16)
-		packet = unpack_from_bytes(f'{length}s', packet[4:])[0]
-		imei = packet.decode('ascii')
-		logger.debug(f'[Teltonika] imei получен {imei}\n')
-		self.sock.send(struct.pack('!B', 1))
-		logger.debug(f'[Teltonika] ответ на сообщение с imei отправлен\n')
+		try:
+			packet = binascii.hexlify(self.sock.recv(34))
+			length = int(packet[:4], 16)
+			packet = unpack_from_bytes(f'{length}s', packet[4:])[0]
+			imei = packet.decode('ascii')
+			logger.debug(f'[Teltonika] imei получен {imei}\n')
+			self.sock.send(struct.pack('!B', 1))
+			logger.debug(f'[Teltonika] ответ на сообщение с imei отправлен\n')
+
+		except Exception as e:
+			self.sock.close()
+			self.stop = True
+			raise e
+
 		return imei
 
 
@@ -97,6 +104,9 @@ class Teltonika:
 				raise ValueError('Unknown codec')
 
 			self.lock.release()
+			sleep(2)
+
+		del(self)
 
 
 	def wait_command(self):
@@ -137,7 +147,7 @@ class Teltonika:
 
 				self.lock.release()
 
-			sleep(1)
+			sleep(2)
 
 
 	def send_command(self, imei, codec, command):
