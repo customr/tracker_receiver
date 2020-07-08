@@ -10,10 +10,12 @@ logger = logging.getLogger()
 logger.setLevel(LEVEL)
 
 handler = RotatingFileHandler(PATH, mode='a', maxBytes=10*1024*1024)
+handler.setLevel(logging.DEBUG)
 handler.setFormatter(frt)
 logger.addHandler(handler)
 
 handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
 handler.setFormatter(frt)
 logger.addHandler(handler)
 
