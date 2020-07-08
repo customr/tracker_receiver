@@ -82,14 +82,20 @@ class Teltonika:
 				self.sock.close()
 				self.stop = True
 				break
-				
+
 			self.lock.acquire()
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
-			packet, _ = extract_int(packet) #preamble zero bytes
-			packet, data_len = extract_uint(packet)
-			packet, self.codec = extract_ubyte(packet)
-			packet, self.count = extract_ubyte(packet)
-		
+			try:
+				packet, z = extract_int(packet) #preamble zero bytes
+				assert z==0, 'Not teltonika packet'
+				packet, data_len = extract_uint(packet)
+				packet, self.codec = extract_ubyte(packet)
+				packet, self.count = extract_ubyte(packet)
+
+			except Exception as e:
+				with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
+					fd.write(f'Ошибка в распаковке {packet}\n{e}\n')
+			
 
 			if self.codec in (8, 142, 16):
 				self.data = self.handle_data(packet)
@@ -443,4 +449,4 @@ class Teltonika:
 		packet, length = extract_short(packet)
 		packet, beacon = extract(packet, length)
 
-		return {"Beacon": beacon}
+		return packet, {"Beacon": beacon}
