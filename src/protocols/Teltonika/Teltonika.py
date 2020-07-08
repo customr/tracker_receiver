@@ -5,7 +5,7 @@ import socket
 import threading
 import datetime
 
-from time import time
+from time import time, sleep
 from json import load
 
 from src.utils import *
@@ -33,6 +33,7 @@ class Teltonika:
 		self.ign_v = get_ignition_v(self.imei)
 		
 		self.lock = threading.Lock()
+		self.stop = False
 		waiter_th = threading.Thread(target=self.wait_command)
 		main_th = threading.Thread(target=self.handle_packet)
 		waiter_th.start()
@@ -62,10 +63,12 @@ class Teltonika:
 
 
 	def handle_packet(self):
-		while True:
+		while not self.stop:
 			try:
 				packet = binascii.hexlify(self.sock.recv(4096))
 			except Exception:
+				self.sock.close()
+				self.stop = True
 				break
 
 			self.lock.acquire()
@@ -100,7 +103,7 @@ class Teltonika:
 		command_path = self.BASE_PATH+'command.txt'
 		result_path =  self.BASE_PATH+'result.txt'
 		error_c = 0
-		while True:
+		while not self.stop:
 			if os.path.getsize(command_path)>0:
 				self.lock.acquire()
 				try:
@@ -110,6 +113,7 @@ class Teltonika:
 
 					if imei!=self.imei: 
 						self.lock.release()
+						command_fd.close()
 						continue
 
 					command = command_file.split('"')[1]
@@ -132,6 +136,8 @@ class Teltonika:
 						res.write(f'Ошибка в обработке команды:\n{e}\n')
 
 				self.lock.release()
+
+			sleep(1)
 
 
 	def send_command(self, imei, codec, command):
@@ -216,28 +222,6 @@ class Teltonika:
 
 			all_data.append(data)
 			logger.debug(f"[Teltonika] #{len(all_data)}:\n{data}\n")
-
-		# for n, rec in enumerate(all_data):
-		# 	for name, x in self.assign.items():
-		# 		if name in rec['iodata'].keys():
-		# 			value = rec['iodata'][name]
-
-		# 			if name=='External Voltage':
-		# 				if self.ign_v is not None:
-		# 					if value>self.ign_v:
-		# 						value = 1
-		# 					else:
-		# 						value = 0
-
-		# 					rec['iodata'].update({'ignition': value})
-		# 					del(rec['iodata'][name])
-		# 					continue
-
-		# 			rec['iodata'].update({x: value})
-		# 			del(rec['iodata'][name])
-
-		# 	rec.update({"imei": int(self.imei)})
-		# 	logger.debug(f"[Teltonika] Record #{n+1} AVL IO Data преобразована\n")
 
 		logger.debug(f'[Teltonika] data:\n{all_data}\n')
 		logger.info(f'Teltonika {self.imei} получено {len(all_data)} записей')
