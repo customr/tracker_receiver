@@ -11,7 +11,14 @@ def extract(packet, length):
 
 def extract_x(packet, letter, length):
 	packet, extracted = extract(packet, length)
-	return packet, struct.unpack(f"!{letter}", binascii.a2b_hex(extracted))[0]
+	extracted = binascii.a2b_hex(extracted)
+	try:
+		x = struct.unpack(f"!{letter}", extracted)[0]
+	except Exception as e:
+		logger.critical(f'Ошибка в распаковке: {letter} {extracted}\n{e}')
+		raise e
+
+	return packet, x
 
 def extract_str(packet, length):
 	return extract_x(packet, f'{length}s', length)

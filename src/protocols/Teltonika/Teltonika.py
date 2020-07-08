@@ -273,7 +273,8 @@ class Teltonika:
 	def codec_8(self, packet):
 		logger.debug(f'[Teltonika] CODEC {self.codec} AVL Data packet:\n{packet}\n')
 		packet, timestamp = extract(packet, 8)
-		timestamp = int(b'0x'+timestamp, 16)
+		timestamp = b'0x'+timestamp
+		timestamp = int(timestamp, 16)
 		timestamp /= 1000
 		packet, _ = extract_ubyte(packet) #priority
 		packet, lon = extract_int(packet)
