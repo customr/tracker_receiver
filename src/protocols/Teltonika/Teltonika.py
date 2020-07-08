@@ -90,6 +90,7 @@ class Teltonika:
 				self.data = self.handle_data(packet)
 				self.data = self.prepare_geo(self.data)
 				count = insert_geo(self.data)
+				self.sock.send(struct.pack("!I", count))
 				logger.debug(f'Teltonika из них безошибочных: {count} записей')
 
 			elif self.codec in (12, 13, 14):
@@ -235,7 +236,6 @@ class Teltonika:
 
 		logger.debug(f'[Teltonika] data:\n{all_data}\n')
 		logger.info(f'Teltonika {self.imei} получено {len(all_data)} записей')
-		self.sock.send(struct.pack("!I", len(all_data)))
 		return all_data
 
 
@@ -271,6 +271,7 @@ class Teltonika:
 		lat /= 10000000
 		packet, alt = extract_ushort(packet)
 		packet, dr = extract_ushort(packet)
+		dr = dr//2
 		packet, sat_num = extract_ubyte(packet)
 		packet, speed = extract_ushort(packet)
 
@@ -354,6 +355,9 @@ class Teltonika:
 					else:
 						iodata.update({self.decoder[str(io_id)]: io_val})
 
+			if 'voltage' in iodata.keys():
+				iodata['voltage'] = iodata['voltage']/1000
+				
 			data.update(iodata)
 		
 
