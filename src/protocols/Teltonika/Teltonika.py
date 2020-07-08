@@ -410,12 +410,6 @@ class Teltonika:
 	def prepare_geo(self, records):
 		all_geo = []
 		for data in records:
-			if not data['iodata'].get('ignition', None):
-				data['iodata'].update({"ignition": 0})
-
-			if not data['iodata'].get('sensor', None):
-				data['iodata'].update({"sensor": 0})
-
 			data['iodata'].update({"sat_num": data['sat_num']})
 			reserve = str(data['iodata']).replace("'", '"')
 			reserve = reserve[1:-1]
@@ -430,8 +424,8 @@ class Teltonika:
 				'direction': data['direction'],
 				'bat': 0,
 				'fuel': 0,
-				'ignition': data['iodata']['ignition'],
-				'sensor': data['iodata']['sensor'],
+				'ignition': data['iodata'].get('ignition', 0),
+				'sensor': data['iodata'].get('sensor', 0),
 				'reserve': reserve,
 				'ts': data['ts']
 			}

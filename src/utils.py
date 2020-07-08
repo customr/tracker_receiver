@@ -15,7 +15,7 @@ def extract_x(packet, letter, length):
 	try:
 		x = struct.unpack(f"!{letter}", extracted)[0]
 	except Exception as e:
-		logger.critical(f'Ошибка в распаковке: {letter} {extracted}\n{e}')
+		logger.critical(f'Ошибка в распаковке: len={length} {letter} {extracted}\n{e}')
 		raise e
 
 	return packet, x
