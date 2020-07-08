@@ -90,6 +90,7 @@ class Teltonika:
 				self.data = self.handle_data(packet)
 				self.data = self.prepare_geo(self.data)
 				count = insert_geo(self.data)
+				logger.info(f'Teltonika {self.imei} принято {count}/{len(self.data)} записей')
 				self.sock.send(struct.pack("!I", count))
 				logger.debug(f'Teltonika из них безошибочных: {count} записей')
 
@@ -235,7 +236,6 @@ class Teltonika:
 			logger.debug(f"[Teltonika] #{len(all_data)}:\n{data}\n")
 
 		logger.debug(f'[Teltonika] data:\n{all_data}\n')
-		logger.info(f'Teltonika {self.imei} получено {len(all_data)} записей')
 		return all_data
 
 
@@ -357,7 +357,7 @@ class Teltonika:
 
 			if 'voltage' in iodata.keys():
 				iodata['voltage'] = iodata['voltage']/1000
-				
+
 			data.update(iodata)
 		
 
