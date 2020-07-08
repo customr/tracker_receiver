@@ -78,12 +78,18 @@ class Teltonika:
 				self.stop = True
 				break
 
-			if len(packet)==0:
+			self.lock.acquire()
+			if len(packet)<8:
+				if packet==b'\xff' or packet==b'':
+					self.sock.close()
+					self.stop = True
+					break
+
+				logger.error(f'[Teltonika] непонятный пакет: {packet}')
 				self.sock.close()
 				self.stop = True
 				break
 
-			self.lock.acquire()
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
 			try:
 				packet, z = extract_int(packet) #preamble zero bytes
@@ -91,6 +97,7 @@ class Teltonika:
 				packet, data_len = extract_uint(packet)
 				packet, self.codec = extract_ubyte(packet)
 				packet, self.count = extract_ubyte(packet)
+				logger.debug(f'[Teltonika] codec={self.codec} rec_count={self.count}\n')
 
 			except Exception as e:
 				with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
