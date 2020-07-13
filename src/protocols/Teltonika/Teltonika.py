@@ -19,16 +19,16 @@ class Teltonika:
 	BASE_PATH = 'tracker_receiver/src/protocols/Teltonika/'
 	NAME = 'Teltonika'
 
-	def __init__(self, sock, addr, model):
+	def __init__(self, sock, addr):
 		self.sock = sock
 		self.addr = addr
-		self.model = model
+
 	
 	def start(self):
 		self.imei = self.handle_imei()
-		logger.info(f'Teltonika{self.model} {self.imei} подключен [{self.addr}]')
+		logger.info(f'Teltonika {self.imei} подключен[{self.addr}]\n')
 
-		self.assign = get_configuration(self.imei, self.model)
+		self.assign, self.model = get_configuration_and_model(self.imei)
 		self.decoder = self.get_decoder(self.model)
 		self.ign_v = get_ignition_v(self.imei)
 		
@@ -79,7 +79,6 @@ class Teltonika:
 				break
 
 			self.lock.acquire()
-
 			if len(packet)<8:
 				if packet==b'\xff' or packet==b'':
 					self.sock.close()

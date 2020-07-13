@@ -14,24 +14,21 @@ def get_ignition_v(imei):
 		query = f'SELECT `ignition_v` from `devices` WHERE `imei`={int(imei)}'
 		with connection.cursor() as cursor:
 			cursor.execute(query)
-			try:
-				ign_v = cursor.fetchone()['ignition_v']
-			except Exception:
-				return None
+			ign_v = cursor.fetchone()['ignition_v']
 
 		return ign_v
 
 
-def get_configuration(imei, d_model):
+def get_configuration_and_model(imei):
 	with closing(pymysql.connect(**CONN)) as connection:
 		query = f'SELECT `params`, `model` from `teltonika_config` WHERE `imei`={int(imei)}'
 		with connection.cursor() as cursor:
 			cursor.execute(query)
 			x = cursor.fetchone()
 			if not isinstance(x, dict):
-				with open(f'tracker_receiver/src/protocols/Teltonika/configurations/{d_model}.json', 'r') as fd:
+				with open('tracker_receiver/src/protocols/Teltonika/default_config.json', 'r') as fd:
 					params = load(fd)
-					model = d_model
+					model = 'fmb920'
 
 				ins_params = str(params).replace("'", '"')
 				query = f"INSERT INTO `teltonika_config` VALUES ({int(imei)}, '{model}', '{ins_params}')"
@@ -42,7 +39,7 @@ def get_configuration(imei, d_model):
 				params = loads(x['params'])
 				model = x['model']
 
-		return params
+		return params, model
 
 
 def insert_geo(data):
