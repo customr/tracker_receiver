@@ -28,24 +28,24 @@ async def handler():
 	    			continue
 
 	    		if rec['action']=='command':
-	    			tracker = Teltonika.get_tracker(imei)
+	    			tracker = Teltonika.Teltonika.get_tracker(imei)
 	    			if tracker is not None:
 	    				logger.info('tracker found')
 	    				Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
 	    				logger.info('command sended')
 
-	    				while Teltonika.command_response=={}:
+	    				while tracker.command_response=={}:
 	    					sleep(0.1)
 
 	    				logger.info('command response')
-	    				ws.send(Teltonika.command_response)
-	    				Teltonika.command_response = {}
+	    				ws.send(tracker.command_response)
+	    				tracker.command_response = {}
 	    			else:
 	    				continue
 
     		except Exception as e:
     			logger.info(e)
-    			
+
 	    	finally:
 	    		break
 
