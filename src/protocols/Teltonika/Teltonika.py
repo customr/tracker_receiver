@@ -5,7 +5,7 @@ import socket
 import threading
 import datetime
 import asyncio
-import websockets
+import websocket
 
 from time import time, sleep
 from json import load, loads, dumps
@@ -14,16 +14,10 @@ from src.utils import *
 from src.db_worker import *
 from src.logs.log_config import logger
 from src.protocols.Teltonika.crc import crc16
-from src.protocols.Teltonika.websocketserver import Server
 
 ws_ip = '127.0.0.1'
 ws_port = 5678
 ws_addr = f"ws://{ws_ip}:{ws_port}/"
-server = Server()
-start_server = websockets.serve(server.ws_handler, ws_ip, ws_port)
-loop = asyncio.get_event_loop()
-loop.run_until_complete()
-loop.run_forever()
 
 class Teltonika:
 
@@ -34,7 +28,7 @@ class Teltonika:
 		self.sock = sock
 		self.addr = addr
 		self.model = model
-		self.ws = websockets.connect(ws_addr)
+
 	
 	def start(self):
 		self.imei = self.handle_imei()
@@ -48,6 +42,10 @@ class Teltonika:
 		self.stop = False
 		waiter_th = threading.Thread(target=self.wait_command)
 		main_th = threading.Thread(target=self.handle_packet)
+
+		ws = websocket.WebSocket()
+		self.ws = ws.connect(ws_addr)
+
 		waiter_th.start()
 		main_th.start()
 

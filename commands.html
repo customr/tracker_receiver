@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>websocket</title>
+    <style type="text/css">
+
+        *{
+            @include tf($tf-fm: $sai);
+            @include other($ot-tsi: $all)
+        }
+
+        body{
+            background: #dfdfdf
+        }
+
+        .container{
+            @include bm(100%, 100%, $bm-pd: 0 16px, $bm-dp: $fl);
+            @include flex-center($rnw)
+        }
+
+        form{
+            @include bm(400px, $bm-dp: $fl);
+            @include flex-center($cw);
+                div, label, input, textarea{
+                    @include bm(100%)
+                }
+        }
+
+        .field:nth-of-type(2){
+            @include bm($bm-mg: 16px 0)
+        }
+
+        label, input, textarea{
+            @include bm($bm-pd: 8px)
+        }
+
+        label, [placeholder]{
+            @include tf(#555)
+        }
+
+        input, textarea{
+            background: rgba(255,255,255,.5);
+            border: none;
+            @include other($ot-br: 4px, $ot-bs: $o-b);
+                &:focus{
+                    background: rgba(255,255,255,1);
+                    @include other($ot-bs: none)
+                }
+        }
+
+
+        button{
+            background: #2f4ad0;
+            @include bm($bm-pd: 8px 16px, $bm-mg: 16px 0 50px 0);
+            @include tf(#fff);
+            border: none;
+            @include other($ot-br: 4px, $ot-cr: pointer, $ot-bs: $o-b);
+                &:hover{
+                    @include tf($tf-ls: 2px);
+                    @include other($ot-bs: none)
+                }
+        }
+    </style>
+    <script type="text/javascript">
+        var ws = new WebSocket("ws://127.0.0.1:5678/");
+
+        ws.onmessage = function (event) {
+            result = JSON.parse(event.data)
+            document.querySelector('#result').value += result['result']
+        };
+
+        function SendCommand()
+        {
+            imei = document.querySelector('#imei').value
+            command = document.querySelector('#command').value
+            codec12 = document.querySelector('#codec12').checked
+            codec14 = document.querySelector('#codec14').checked
+            if (codec12){
+                codec = "12"
+            }else if (codec14){
+                codec = "14"
+            }
+
+            ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: command}))
+        }
+    </script>
+</head>
+
+<body>
+    <div class="field">
+        <label for="imei">IMEI:</label><br>
+        <input type="text" id="imei" name="imei" value="" placeholder="15 цифр" required><br><br>
+    </div>
+    <div class="field">
+        <label for="command">Команда:</label><br>
+        <input type="text" id="command" name="command" value="" required><br><br>
+    </div>
+    <div class="field">
+        Кодек:<br>
+        <label for="codec">12</label>
+        <input type="radio" id="codec12" name="codec" value="12" checked/> 
+        <label for="codec">14</label>
+        <input type="radio" id="codec14" name="codec" value="14"/> 
+    </div>
+    <div class="field">
+        <input type="button" onclick="SendCommand()" value="Выполнить">
+    </div><br>
+    Результат:<br>
+    <textarea id="result"></textarea>
+</body>
+</html>

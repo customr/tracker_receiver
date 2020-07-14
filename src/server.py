@@ -8,7 +8,7 @@ from src.logs.log_config import logger
 
 class TrackerServer:
 	def __init__(self, protocol, server, model=''):
-		self.ip, self.port = server[0], server[1]
+		self.ip, self.port = server.split(':')
 		self.model = model
 		self.sock = socket.socket()
 		self.sock.bind((self.ip, int(self.port)))
