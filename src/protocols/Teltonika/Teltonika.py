@@ -4,15 +4,26 @@ import binascii
 import socket
 import threading
 import datetime
+import asyncio
+import websockets
 
 from time import time, sleep
-from json import load
+from json import load, loads, dumps
 
 from src.utils import *
 from src.db_worker import *
 from src.logs.log_config import logger
 from src.protocols.Teltonika.crc import crc16
+from src.protocols.Teltonika.websocketserver import Server
 
+ws_ip = '127.0.0.1'
+ws_port = 5678
+ws_addr = f"ws://{ws_ip}:{ws_port}/"
+server = Server()
+start_server = websockets.serve(server.ws_handler, ws_ip, ws_port)
+loop = asyncio.get_event_loop()
+loop.run_until_complete()
+loop.run_forever()
 
 class Teltonika:
 
@@ -23,10 +34,11 @@ class Teltonika:
 		self.sock = sock
 		self.addr = addr
 		self.model = model
+		self.ws = websockets.connect(ws_addr)
 	
 	def start(self):
 		self.imei = self.handle_imei()
-		logger.info(f'Teltonika{self.model} {self.imei} подключен [{self.addr}]')
+		logger.info(f'Teltonika{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
 
 		self.assign = get_configuration(self.imei, self.model)
 		self.decoder = self.get_decoder(self.model)
@@ -81,15 +93,14 @@ class Teltonika:
 			self.lock.acquire()
 
 			if len(packet)<8:
-				if packet==b'\xff' or packet==b'':
+				if packet==b'\xff' or packet==b'' or packet==b'ff':
+					continue
+
+				else:
+					logger.error(f'[Teltonika] непонятный пакет: {packet}')
 					self.sock.close()
 					self.stop = True
 					break
-
-				logger.error(f'[Teltonika] непонятный пакет: {packet}')
-				self.sock.close()
-				self.stop = True
-				break
 
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
 			try:
@@ -109,15 +120,15 @@ class Teltonika:
 				self.data = self.handle_data(packet)
 				self.data = self.prepare_geo(self.data)
 				count = insert_geo(self.data)
-				logger.info(f'Teltonika {self.imei} принято {count}/{len(self.data)} записей')
+				logger.info(f'Teltonika{self.model} {self.imei} принято {count}/{len(self.data)} записей')
 				self.sock.send(struct.pack("!I", count))
 
 			elif self.codec in (12, 13, 14):
 				result = self.handle_command(packet)
-				with open(self.BASE_PATH+'result.txt', 'w') as res:
-					res.write(result)
-
-				logger.info(f'[Teltonika] ответ на команду принят\n')
+				result = {"action":"response", "result": result}
+				result = json.dumps(result)
+				self.ws.send(result)
+				logger.debug(f'[Teltonika] ответ на команду принят\n{result}\n')
 
 			else:
 				logger.critical(f"Teltonika неизвестный кодек {self.codec}")
@@ -130,44 +141,18 @@ class Teltonika:
 
 
 	def wait_command(self):
-		command_path = self.BASE_PATH+'command.txt'
-		result_path =  self.BASE_PATH+'result.txt'
-		error_c = 0
 		while not self.stop:
-			if os.path.getsize(command_path)>0:
-				self.lock.acquire()
-				try:
-					command_fd = open(command_path, 'r')
-					command_file = command_fd.read()
-					imei, codec = command_file.split(' ')[:2]
+			data = self.ws.recv()
+			data = loads(data)
+			if data['action']!='command':
+				continue
 
-					if imei!=self.imei: 
-						self.lock.release()
-						command_fd.close()
-						continue
+			if str(data['imei'])!=str(self.imei):
+				continue
 
-					command = command_file.split('"')[1]
-					msg = f'[Teltonika] команда дешифрована:\nimei={imei}\ncodec={codec}\ncommand={command}\n'
-					logger.debug(msg)
-					command_fd.close()
-					open(command_path, 'w').close()
-					self.send_command(imei, codec, command)
-					error_c = 0
-
-				except Exception as e:
-					error_c += 1
-					logger.error(f'Teltonika ошибка в обработке команды:\n{e}\nПопытка={error_c}\n')
-					command_fd.close()
-					
-					if error_c>1:
-						open(command_path, 'w').close()
-
-					with open(result_path, 'w') as res:
-						res.write(f'Ошибка в обработке команды:\n{e}\n')
-
-				self.lock.release()
-
-			sleep(2)
+			self.lock.acquire()
+			self.send_command(**data)
+			self.lock.release()
 
 
 	def send_command(self, imei, codec, command):
@@ -208,10 +193,6 @@ class Teltonika:
 		packet = pack(packet)
 		self.sock.send(packet)
 		logger.debug(f'[Teltonika] команда отправлена\n')
-
-		if result:
-			with open(self.BASE_PATH+'result.txt', 'w') as res:
-				res.write(result)
 
 
 	def handle_data(self, packet):
