@@ -123,7 +123,7 @@ class Teltonika:
 				result = self.handle_command(packet)
 				resp = {"action":"response", "result": result}
 				resp = dumps(resp)
-				self.command_response = resp
+				self.command_response = resp.encode('ascii')
 				logger.debug(f'[Teltonika] ответ на команду принят\n{result}\n')
 
 			else:
@@ -337,14 +337,13 @@ class Teltonika:
 						ikey = self.assign[self.decoder[str(io_id)]]
 						if '*' in ikey:
 							spl = ikey.split('*')
-							iokey, k = spl[0], spl[1]
-							io_val = io_val*int(k)
+							ikey, k = spl[0], spl[1]
+							io_val = round(io_val*float(k), 4)
 
-						iodata.update({iokey: io_val})
+						iodata.update({ikey: io_val})
 
 					else:
-						self.decoder[str(io_id)]
-						iodata.update({: io_val})
+						iodata.update({self.decoder[str(io_id)]: io_val})
 
 			data.update(iodata)
 		
@@ -370,7 +369,13 @@ class Teltonika:
 						iodata.update({self.assign[str(io_id)]: io_val})
 
 					elif self.decoder[str(io_id)] in self.assign.keys():
-						iodata.update({self.assign[self.decoder[str(io_id)]]: io_val})
+						ikey = self.assign[self.decoder[str(io_id)]]
+						if '*' in ikey:
+							spl = ikey.split('*')
+							ikey, k = spl[0], spl[1]
+							io_val = round(io_val*float(k), 4)
+
+						iodata.update({ikey: io_val})
 
 					else:
 						iodata.update({self.decoder[str(io_id)]: io_val})
