@@ -422,7 +422,7 @@ class Teltonika:
 	@staticmethod
 	def get_tracker(imei):
 		for t in Teltonika.TRACKERS:
-			if str(t.imei)==str(imei)
+			if str(t.imei)==str(imei):
 				return t
 
 		return None

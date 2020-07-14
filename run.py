@@ -23,7 +23,8 @@ async def handler():
 	    		rec = await ws.recv()
 	    		try:
 	    			rec = loads(rec)
-	    		except Exception:
+	    		except Exception as e:
+	    			logger.info(e)
 	    			continue
 
 	    		if rec['action']=='command':
@@ -42,6 +43,9 @@ async def handler():
 	    			else:
 	    				continue
 
+    		except Exception as e:
+    			logger.info(e)
+    			
 	    	finally:
 	    		break
 
