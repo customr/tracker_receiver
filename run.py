@@ -32,7 +32,7 @@ async def handler():
 	    			if tracker is not None:
 	    				logger.debug(f"WEBSOCKET tracker {rec['imei']} found\n")
 	    				Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
-	    				logger.debug(f'WEBSOCKET command sended')
+	    				logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent")
 
 	    				while tracker.command_response=={}:
 	    					sleep(0.1)
@@ -41,7 +41,8 @@ async def handler():
 	    				await ws.send(tracker.command_response)
 	    				tracker.command_response = {}
 	    			else:
-	    				await ws.send(dumps({"action":"response", "response": "Трекер не подключен"}))
+	    				await ws.send(dumps({"action":"response", "response": "Трекер не подключен"}).encode('ascii'))
+	    				logger.info(f"WEBSOCKET {rec['imei']} не подключен")
 	    				break
 
 	    		else:
