@@ -67,7 +67,9 @@
 
         ws.onmessage = function (event) {
             result = JSON.parse(event.data)
-            document.querySelector('#result').value += result['result']
+            if (result['action']=='response'){
+                document.querySelector('#result').value += result['result'];
+            }
         };
 
         function SendCommand()

@@ -4,11 +4,9 @@ import binascii
 import socket
 import threading
 import datetime
-import asyncio
-import websocket
 
 from time import time, sleep
-from json import load, loads, dumps
+from json import load, loads
 
 from src.utils import *
 from src.db_worker import *
@@ -23,16 +21,19 @@ class Teltonika:
 
 	BASE_PATH = 'tracker_receiver/src/protocols/Teltonika/'
 	NAME = 'Teltonika'
+	TRACKERS = set()
 
 	def __init__(self, sock, addr, model):
 		self.sock = sock
 		self.addr = addr
 		self.model = model
+		self.command_response = {}
 
 	
 	def start(self):
 		self.imei = self.handle_imei()
 		logger.info(f'Teltonika{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
+		self.TRACKERS.add(self)
 
 		self.assign = get_configuration(self.imei, self.model)
 		self.decoder = self.get_decoder(self.model)
@@ -40,13 +41,7 @@ class Teltonika:
 		
 		self.lock = threading.Lock()
 		self.stop = False
-		waiter_th = threading.Thread(target=self.wait_command)
 		main_th = threading.Thread(target=self.handle_packet)
-
-		ws = websocket.WebSocket()
-		self.ws = ws.connect(ws_addr)
-
-		waiter_th.start()
 		main_th.start()
 
 
@@ -73,6 +68,7 @@ class Teltonika:
 
 		except Exception as e:
 			self.sock.close()
+			self.TRACKERS.remove(self)
 			self.stop = True
 			raise e
 
@@ -86,6 +82,7 @@ class Teltonika:
 			except Exception:
 				self.sock.close()
 				self.stop = True
+				self.TRACKERS.remove(self)
 				break
 
 			self.lock.acquire()
@@ -98,6 +95,7 @@ class Teltonika:
 					logger.error(f'[Teltonika] непонятный пакет: {packet}')
 					self.sock.close()
 					self.stop = True
+					self.TRACKERS.remove(self)
 					break
 
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
@@ -123,9 +121,9 @@ class Teltonika:
 
 			elif self.codec in (12, 13, 14):
 				result = self.handle_command(packet)
-				result = {"action":"response", "result": result}
-				result = json.dumps(result)
-				self.ws.send(result)
+				resp = {"action":"response", "result": result}
+				resp = json.dumps(resp)
+				self.command_response = resp
 				logger.debug(f'[Teltonika] ответ на команду принят\n{result}\n')
 
 			else:
@@ -138,22 +136,7 @@ class Teltonika:
 		del(self)
 
 
-	def wait_command(self):
-		while not self.stop:
-			data = self.ws.recv()
-			data = loads(data)
-			if data['action']!='command':
-				continue
-
-			if str(data['imei'])!=str(self.imei):
-				continue
-
-			self.lock.acquire()
-			self.send_command(**data)
-			self.lock.release()
-
-
-	def send_command(self, imei, codec, command):
+	def send_command(self, codec, command):
 		result = ''
 		codec = int(codec)
 		if codec==12:
@@ -181,7 +164,7 @@ class Teltonika:
 		packet = add_uint(packet, com_length)
 
 		if codec==14:
-			packet = add_str(packet, imei.rjust(16, '0'))
+			packet = add_str(packet, self.imei.rjust(16, '0'))
 
 		packet = add_str(packet, command)
 		packet = add_ubyte(packet, 1)
@@ -434,3 +417,12 @@ class Teltonika:
 		packet, beacon = extract(packet, length)
 
 		return packet, {"Beacon": beacon}
+
+
+	@staticmethod
+	def get_tracker(imei):
+		for t in Teltonika.TRACKERS:
+			if str(t.imei)==str(imei)
+				return t
+
+		return None
