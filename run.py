@@ -38,7 +38,11 @@ async def handler():
 	    					sleep(0.1)
 
 	    				logger.debug(f'WEBSOCKET command response\n{tracker.command_response}\n')
-	    				await ws.send(tracker.command_response)
+	    				try:
+	    					await ws.send(tracker.command_response)
+	    				except Exception as e:
+	    					logger.error(f"WEBSOCKET ошибка при отправке ответа {e}")
+
 	    				tracker.command_response = {}
 	    			else:
 	    				await ws.send(dumps({"action":"response", "response": "Трекер не подключен"}).encode('ascii'))
