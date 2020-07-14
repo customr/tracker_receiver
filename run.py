@@ -24,30 +24,33 @@ async def handler():
 	    		try:
 	    			rec = loads(rec)
 	    		except Exception as e:
-	    			logger.info(e)
+	    			logger.error(f'WEBSOCKET неизвестный пакет: {rec} {e}\n')
 	    			continue
-
+	    		
 	    		if rec['action']=='command':
-	    			tracker = Teltonika.Teltonika.get_tracker(imei)
+	    			tracker = Teltonika.Teltonika.get_tracker(rec['imei'])
 	    			if tracker is not None:
-	    				logger.info('tracker found')
-	    				Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
-	    				logger.info('command sended')
+	    				logger.debug(f'WEBSOCKET tracker {rec['imei']} found\n')
+	    				Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
+	    				logger.debug(f'WEBSOCKET command sended')
 
 	    				while tracker.command_response=={}:
 	    					sleep(0.1)
 
-	    				logger.info('command response')
+	    				logger.debug(f'WEBSOCKET command response\n{tracker.command_response}\n')
 	    				ws.send(tracker.command_response)
 	    				tracker.command_response = {}
 	    			else:
+	    				logger.debug(f'WEBSOCKET {rec['imei']} not found')
 	    				continue
+
+	    		else:
+	    			continue
 
     		except Exception as e:
     			logger.info(e)
+    			break
 
-	    	finally:
-	    		break
 
 
 def check_log_size():

@@ -14,6 +14,16 @@
             background: #dfdfdf
         }
 
+        textarea{
+            width: 600px;
+            height: 200px
+        }
+
+        #command{
+            width: 200px;
+            height: 100px
+        }
+
         .container{
             @include bm(100%, 100%, $bm-pd: 0 16px, $bm-dp: $fl);
             @include flex-center($rnw)
@@ -75,7 +85,7 @@
         function SendCommand()
         {
             imei = document.querySelector('#imei').value
-            command = document.querySelector('#command').value
+            commands = document.querySelector('#command').value
             codec12 = document.querySelector('#codec12').checked
             codec14 = document.querySelector('#codec14').checked
             if (codec12){
@@ -84,7 +94,11 @@
                 codec = "14"
             }
 
-            ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: command}))
+            document.querySelector('#result').value = 'Ждем ответа от трекера...'
+            for (com of commands.split('\n')){
+                document.querySelector('#result').value = ''
+                ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: com}))
+            }
         }
     </script>
 </head>
@@ -96,7 +110,7 @@
     </div>
     <div class="field">
         <label for="command">Команда:</label><br>
-        <input type="text" id="command" name="command" value="" required><br><br>
+        <textarea id="command" value="" required></textarea><br>
     </div>
     <div class="field">
         Кодек:<br>

@@ -6,7 +6,7 @@ import threading
 import datetime
 
 from time import time, sleep
-from json import load, loads
+from json import load, loads, dumps
 
 from src.utils import *
 from src.db_worker import *
@@ -33,7 +33,7 @@ class Teltonika:
 	def start(self):
 		self.imei = self.handle_imei()
 		logger.info(f'Teltonika{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
-		self.TRACKERS.add(self)
+		Teltonika.TRACKERS.add(self)
 
 		self.assign = get_configuration(self.imei, self.model)
 		self.decoder = self.get_decoder(self.model)
@@ -68,7 +68,7 @@ class Teltonika:
 
 		except Exception as e:
 			self.sock.close()
-			self.TRACKERS.remove(self)
+			Teltonika.TRACKERS.remove(self)
 			self.stop = True
 			raise e
 
@@ -82,7 +82,7 @@ class Teltonika:
 			except Exception:
 				self.sock.close()
 				self.stop = True
-				self.TRACKERS.remove(self)
+				Teltonika.TRACKERS.remove(self)
 				break
 
 			self.lock.acquire()
@@ -95,7 +95,7 @@ class Teltonika:
 					logger.error(f'[Teltonika] непонятный пакет: {packet}')
 					self.sock.close()
 					self.stop = True
-					self.TRACKERS.remove(self)
+					Teltonika.TRACKERS.remove(self)
 					break
 
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
@@ -122,7 +122,7 @@ class Teltonika:
 			elif self.codec in (12, 13, 14):
 				result = self.handle_command(packet)
 				resp = {"action":"response", "result": result}
-				resp = json.dumps(resp)
+				resp = dumps(resp)
 				self.command_response = resp
 				logger.debug(f'[Teltonika] ответ на команду принят\n{result}\n')
 
