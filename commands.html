@@ -3,126 +3,185 @@
 <head>
     <meta charset="utf-8">
     <title>websocket</title>
-    <style type="text/css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Courier">
+    <style>
+    html{
+        height: 95vh;
+    }
+    body{
+        font-family: Lato, Arial, Helvetica, sans-serif;
+        letter-spacing: 0.09em;
+        font-size: 16px;
+        height: 100%;
 
-        *{
-            @include tf($tf-fm: $sai);
-            @include other($ot-tsi: $all)
-        }
+        background-image: url(https://wallpaperaccess.com/full/38598.jpg);
+        background-position-x: center;
+        background-position-y: center;
+    }
+    input, textarea{
+        font-size: 16px
+    }
+    input[type='text']{
+        border-radius: 5px;
+        border-width: 1px;
+        width: 15ch;
+        background-color: #57565f;
+    }
+    input[type='button']{
 
-        body{
-            background: #dfdfdf
-        }
+    }
+    textarea{
+        border-radius: 5px;
+        border-width: 1px;
+        box-sizing: border-box;
+    }
+    div#main{
+        max-height: 95vh;
+        height: 100%;
+    }
+    div.float{
+        margin-top: 10px;
+        display: flex;
+    }
+    div.left-block{
+        width: 15%;
+        min-width: 17ch;
+        max-width: 172px;
+        /* display: inline-block; */
+        float: left;
+        background-color: whitesmoke;
+        padding-left: 0.8%;
+        padding-bottom: 1%;
+        border-radius: 5px;
+        /* box-sizing: border-box; */
+    }
+    div.right-block{
+        display: flex;
+        flex-direction: column;
+        /* width: 100%; */
+        min-height: 300px;
+        height: 100%;
+        /* max-width: 500px; */
+    }
+    div.title-container{
+        position: relative;
+        /* border: 1px solid; */
+        border-radius: 5px;
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+        border-bottom: none;
 
-        textarea{
-            width: 600px;
-            height: 200px
-        }
-
-        #command{
-            width: 200px;
-            height: 100px
-        }
-
-        .container{
-            @include bm(100%, 100%, $bm-pd: 0 16px, $bm-dp: $fl);
-            @include flex-center($rnw)
-        }
-
-        form{
-            @include bm(400px, $bm-dp: $fl);
-            @include flex-center($cw);
-                div, label, input, textarea{
-                    @include bm(100%)
-                }
-        }
-
-        .field:nth-of-type(2){
-            @include bm($bm-mg: 16px 0)
-        }
-
-        label, input, textarea{
-            @include bm($bm-pd: 8px)
-        }
-
-        label, [placeholder]{
-            @include tf(#555)
-        }
-
-        input, textarea{
-            background: rgba(255,255,255,.5);
-            border: none;
-            @include other($ot-br: 4px, $ot-bs: $o-b);
-                &:focus{
-                    background: rgba(255,255,255,1);
-                    @include other($ot-bs: none)
-                }
-        }
-
-
-        button{
-            background: #2f4ad0;
-            @include bm($bm-pd: 8px 16px, $bm-mg: 16px 0 50px 0);
-            @include tf(#fff);
-            border: none;
-            @include other($ot-br: 4px, $ot-cr: pointer, $ot-bs: $o-b);
-                &:hover{
-                    @include tf($tf-ls: 2px);
-                    @include other($ot-bs: none)
-                }
-        }
+        background-image: linear-gradient(#FFFDFC 10%, #e0d6d1 60%, #C5A996);
+        margin-bottom: 0px;
+        padding: 2px;
+    }
+    .dot{
+        top: 0.45em;
+        margin-left: 70%;
+        display: inline-block;
+        width: 0.6em;
+        height: 0.6em;
+        border-radius: 0.3em;
+        background-color: red;
+    }
+    .console-window{
+        /* margin-top: 0.5em; */
+        display: inline-block;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+        /* border-color: #755642; */
+        border-width: 0px;
+        background-color: #57565f;
+        color: white;
+        font-family: Courier;
+        display: block;
+        height: 100%;
+        resize: none;
+        width: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    .console-window:focus{
+        outline: 0px;
+        box-shadow: none !important;
+    }
+    #consoles-container{
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        height: 100%;
+    }
+    #consoles-container>div{
+        width: 48.5%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 8px 8px 40px;
+    }
     </style>
+</head>
+
+<body>
+    <div id='main'>
+        <div class='left-block'>
+            <label for="imei">IMEI:</label><br>
+            <input type="text" id="imei" name="imei" value="" maxlength="15" placeholder="15 цифр" required>
+            <br/>
+            <label>
+                Codec:<br>
+                <input type="radio" id="codec12" name="codec" value="12" checked/> 
+                <label for="codec">12</label>
+                <br/>
+                <input type="radio" id="codec14" name="codec" value="14"/>
+                <label for="codec">14</label>
+            </label>
+            <br/>
+            <input type="button" onclick="SendCommand()" value="Выполнить">
+        </div>
+        <div class='right-block'>
+            <div id='consoles-container'>
+                <div>
+                    <div class="title-container">
+                        <label for="command">Command</label>
+                    </div>
+                    <textarea spellcheck='false' class='console-window' id="command" value="" required></textarea>
+                </div>
+    
+                <div>
+                    <div class='title-container'>
+                        <label for="result-window">Output</label>
+                    </div>
+                    <textarea spellcheck='false' class="console-window" id='result' readonly></textarea>
+                </div>         
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
         var ws = new WebSocket("ws://127.0.0.1:5678/");
 
-        ws.onmessage = function (event) {
-            result = JSON.parse(event.data)
+        let sep = '\n\n'
+
+        ws.onmessage = (event) => {
+            let result = JSON.parse(event.data)
             if (result['action']=='response'){
-                document.querySelector('#result').value += result['result'];
+                document.querySelector('#result').value += `${result['result']}${sep}`
             }
         };
 
+        ws.onerror = (e) => console.error(e), document.querySelector('#result').value += `WebSocket error occured, check console for more details${sep}`
+        ws.onclose = (e) => console.log(e), document.querySelector('#result').value += `WebSocket closed connection${sep}`
+
         function SendCommand()
         {
-            imei = document.querySelector('#imei').value
-            commands = document.querySelector('#command').value
-            codec12 = document.querySelector('#codec12').checked
-            codec14 = document.querySelector('#codec14').checked
-            if (codec12){
-                codec = "12"
-            }else if (codec14){
-                codec = "14"
-            }
+            let imei = document.querySelector('#imei').value
+            let commands = document.querySelector('#command').value
+            let codec = document.querySelector('[name=codec][checked]').value
 
-            document.querySelector('#result').value = 'Ждем ответа от трекера...'
-            for (com of commands.split('\n')){
-                document.querySelector('#result').value = ''
+            for (let com of commands.split('\n')){
                 ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: com}))
             }
         }
     </script>
-</head>
-
-<body>
-    <div class="field">
-        <label for="imei">IMEI:</label><br>
-        <input type="text" id="imei" name="imei" value="" placeholder="15 цифр" required><br><br>
-    </div>
-    <div class="field">
-        <label for="command">Команда:</label><br>
-        <textarea id="command" value="" required></textarea><br>
-    </div>
-    <div class="field">
-        Кодек:<br>
-        <label for="codec">12</label>
-        <input type="radio" id="codec12" name="codec" value="12" checked/> 
-        <label for="codec">14</label>
-        <input type="radio" id="codec14" name="codec" value="14"/> 
-    </div>
-    <div class="field">
-        <input type="button" onclick="SendCommand()" value="Выполнить">
-    </div><br>
-    Результат:<br>
-    <textarea id="result"></textarea>
 </body>
 </html>

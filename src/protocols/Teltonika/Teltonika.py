@@ -334,16 +334,17 @@ class Teltonika:
 						iodata.update({self.assign[str(io_id)]: io_val})
 
 					elif self.decoder[str(io_id)] in self.assign.keys():
-						iodata.update({self.assign[self.decoder[str(io_id)]]: io_val})
+						ikey = self.assign[self.decoder[str(io_id)]]
+						if '*' in ikey:
+							spl = ikey.split('*')
+							iokey, k = spl[0], spl[1]
+							io_val = io_val*int(k)
+
+						iodata.update({iokey: io_val})
 
 					else:
-						iodata.update({self.decoder[str(io_id)]: io_val})
-
-			if 'voltage' in iodata.keys():
-				iodata['voltage'] = iodata['voltage']/1000
-
-			if 'Battery Voltage' in iodata.keys():
-				iodata['Battery Voltage'] = iodata['Battery Voltage']/1000
+						self.decoder[str(io_id)]
+						iodata.update({: io_val})
 
 			data.update(iodata)
 		
@@ -383,7 +384,7 @@ class Teltonika:
 		all_geo = []
 		for data in records:
 			data['iodata'].update({"sat_num": data['sat_num']})
-			reserve = str(data['iodata']).replace("'", '"')
+			reserve = str(data['iodata']).replace("'", '"').replace(' ', '')
 			reserve = reserve[1:-1]
 
 			geo = {

@@ -4,7 +4,7 @@ import websockets
 import asyncio
 
 from time import sleep
-from json import load, loads
+from json import load, loads, dumps
 
 from src.server import TrackerServer
 from src.protocols.Teltonika import Teltonika
@@ -38,11 +38,11 @@ async def handler():
 	    					sleep(0.1)
 
 	    				logger.debug(f'WEBSOCKET command response\n{tracker.command_response}\n')
-	    				ws.send(tracker.command_response)
+	    				await ws.send(tracker.command_response)
 	    				tracker.command_response = {}
 	    			else:
-	    				logger.debug(f"WEBSOCKET {rec['imei']} not found")
-	    				continue
+	    				await ws.send(dumps({"action":"response", "response": "Трекер не подключен"}))
+	    				break
 
 	    		else:
 	    			continue
