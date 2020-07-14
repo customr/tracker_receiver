@@ -8,7 +8,7 @@ from json import load, loads
 
 from src.server import TrackerServer
 from src.protocols.Teltonika import Teltonika
-
+from src.logs.log_config import logger
 
 protocols = {
 	'teltonika': Teltonika.Teltonika
@@ -29,10 +29,14 @@ async def handler():
 	    		if rec['action']=='command':
 	    			tracker = Teltonika.get_tracker(imei)
 	    			if tracker is not None:
+	    				logger.info('tracker found')
 	    				Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
+	    				logger.info('command sended')
+
 	    				while Teltonika.command_response=={}:
 	    					sleep(0.1)
 
+	    				logger.info('command response')
 	    				ws.send(Teltonika.command_response)
 	    				Teltonika.command_response = {}
 	    			else:
