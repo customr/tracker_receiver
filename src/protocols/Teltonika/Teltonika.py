@@ -13,9 +13,6 @@ from src.db_worker import *
 from src.logs.log_config import logger
 from src.protocols.Teltonika.crc import crc16
 
-ws_ip = '127.0.0.1'
-ws_port = 5678
-ws_addr = f"ws://{ws_ip}:{ws_port}/"
 
 class Teltonika:
 

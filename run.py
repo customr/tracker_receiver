@@ -47,7 +47,7 @@ async def handler(ws, path):
 						tracker.command_response = {}
 
 				else:
-					await ws.send(dumps({"action":"response", "response": "Трекер не подключен"}))
+					await ws.send(dumps({"action":"response", "result": "Трекер не подключен"}))
 					logger.info(f"WEBSOCKET {rec['imei']} не подключен\n")
 					continue
 

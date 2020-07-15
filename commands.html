@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <title>websocket</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Courier">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <style>
     html{
         height: 95vh;
     }
     body{
         font-family: Lato, Arial, Helvetica, sans-serif;
-        letter-spacing: 0.09em;
+        letter-spacing: 0.03em;
         font-size: 16px;
         height: 100%;
 
@@ -29,7 +29,7 @@
         background-color: #57565f;
     }
     input[type='button']{
-
+        margin: 5px;
     }
     textarea{
         border-radius: 5px;
@@ -94,7 +94,7 @@
         border-width: 0px;
         background-color: #57565f;
         color: white;
-        font-family: Courier;
+        font-family: Roboto;
         display: block;
         height: 100%;
         resize: none;
@@ -129,7 +129,7 @@
             <input type="text" id="imei" name="imei" value="" maxlength="15" placeholder="15 цифр" required>
             <br/>
             <label>
-                Codec:<br>
+                Кодек:<br>
                 <input type="radio" id="codec12" name="codec" value="12" checked/> 
                 <label for="codec">12</label>
                 <br/>
@@ -137,20 +137,21 @@
                 <label for="codec">14</label>
             </label>
             <br/>
-            <input type="button" onclick="SendCommand()" value="Выполнить">
+            <input type="button" onclick="SendCommand()" value="Выполнить"><br/>
+            <input type="button" onclick="ClearOutput()" value="Очистить вывод"><br/>
         </div>
         <div class='right-block'>
             <div id='consoles-container'>
                 <div>
                     <div class="title-container">
-                        <label for="command">Command</label>
+                        <label for="command">Команды (каждая команда на новой строке)</label>
                     </div>
                     <textarea spellcheck='false' class='console-window' id="command" value="" required></textarea>
                 </div>
     
                 <div>
                     <div class='title-container'>
-                        <label for="result-window">Output</label>
+                        <label for="result-window">Вывод</label>
                     </div>
                     <textarea spellcheck='false' class="console-window" id='result' readonly></textarea>
                 </div>         
@@ -166,17 +167,22 @@
             let result = JSON.parse(event.data)
             console.log(result)
             if (result['action']=='response'){
-                document.querySelector('#result').value += `${result['response']}${sep}`
+                document.querySelector('#result').value += `${result['result']}${sep}`
             }
         };
 
         ws.onerror = (e) => {
             console.error(e)
-            document.querySelector('#result').value += `WebSocket error occured, check console for more details${sep}`
+            document.querySelector('#result').value += `WebSocket ошибка. Проверьте консоль${sep}`
         }
         ws.onclose = (e) => {
             console.log(e)
-            document.querySelector('#result').value += `WebSocket closed connection${sep}`
+            document.querySelector('#result').value += `WebSocket закрыл соединение${sep}`
+        }
+
+        function ClearOutput()
+        {
+            document.querySelector('#result').value = ''
         }
 
         function SendCommand()
@@ -190,6 +196,7 @@
 
             }else{
                 for (let com of commands.split('\n')){
+                    document.querySelector('#result').value += `%COMMAND% ${imei} ${com}\n`
                     ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: com}))
                 }
             }

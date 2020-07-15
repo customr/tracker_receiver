@@ -1,4 +1,3 @@
 __pycache__
-history.log
-errors.log
+*.log
 db_connect.py
