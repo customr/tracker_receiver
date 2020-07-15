@@ -123,7 +123,7 @@ class Teltonika:
 				result = self.handle_command(packet)
 				resp = {"action":"response", "result": result}
 				resp = dumps(resp)
-				self.command_response = resp.encode('ascii')
+				self.command_response = resp
 				logger.debug(f'[Teltonika] ответ на команду принят\n{result}\n')
 
 			else:

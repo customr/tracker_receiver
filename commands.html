@@ -164,13 +164,20 @@
 
         ws.onmessage = (event) => {
             let result = JSON.parse(event.data)
+            console.log(result)
             if (result['action']=='response'){
-                document.querySelector('#result').value += `${result['result']}${sep}`
+                document.querySelector('#result').value += `${result['response']}${sep}`
             }
         };
 
-        ws.onerror = (e) => console.error(e), document.querySelector('#result').value += `WebSocket error occured, check console for more details${sep}`
-        ws.onclose = (e) => console.log(e), document.querySelector('#result').value += `WebSocket closed connection${sep}`
+        ws.onerror = (e) => {
+            console.error(e)
+            document.querySelector('#result').value += `WebSocket error occured, check console for more details${sep}`
+        }
+        ws.onclose = (e) => {
+            console.log(e)
+            document.querySelector('#result').value += `WebSocket closed connection${sep}`
+        }
 
         function SendCommand()
         {
@@ -178,8 +185,13 @@
             let commands = document.querySelector('#command').value
             let codec = document.querySelector('[name=codec][checked]').value
 
-            for (let com of commands.split('\n')){
-                ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: com}))
+            if (commands==''){
+                document.querySelector('#result').value += `Введите команды${sep}`
+
+            }else{
+                for (let com of commands.split('\n')){
+                    ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: com}))
+                }
             }
         }
     </script>

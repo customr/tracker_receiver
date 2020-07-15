@@ -2,7 +2,7 @@ import logging
 import sys
 from logging.handlers import RotatingFileHandler
 
-PATH = "tracker_receiver/src/logs/"
+PATH = "src/logs/"
 LEVEL = logging.DEBUG
 frt = logging.Formatter('%(levelname)s :: %(message)s %(asctime)s\n'+'-'*15)
 

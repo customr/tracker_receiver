@@ -15,46 +15,48 @@ protocols = {
 }
 
 
-async def handler():
-    uri = "ws://localhost:5678"
-    async with websockets.connect(uri) as ws:
-    	while True:
-	    	try:
-	    		rec = await ws.recv()
-	    		try:
-	    			rec = loads(rec)
-	    		except Exception as e:
-	    			logger.error(f'WEBSOCKET неизвестный пакет: {rec} {e}\n')
-	    			continue
-	    		
-	    		if rec['action']=='command':
-	    			tracker = Teltonika.Teltonika.get_tracker(rec['imei'])
-	    			if tracker is not None:
-	    				logger.debug(f"WEBSOCKET tracker {rec['imei']} found\n")
-	    				Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
-	    				logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent")
+async def handler(ws, path):
+	while True:
+		try:
+			rec = await ws.recv()
+			try:
+				rec = loads(rec)
+			except Exception as e:
+				logger.error(f'WEBSOCKET неизвестный пакет: {rec} {e}\n')
+				continue
+			
+			if rec['action']=='command':
+				tracker = Teltonika.Teltonika.get_tracker(rec['imei'])
+				if tracker is not None:
+					logger.debug(f"WEBSOCKET tracker {rec['imei']} found\n")
+					Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
+					logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent\n")
 
-	    				while tracker.command_response=={}:
-	    					sleep(0.1)
+					for _ in range(10):
+						sleep(2)
+						if tracker.command_response!={}:
+							break
 
-	    				logger.debug(f'WEBSOCKET command response\n{tracker.command_response}\n')
-	    				try:
-	    					await ws.send(tracker.command_response)
-	    				except Exception as e:
-	    					logger.error(f"WEBSOCKET ошибка при отправке ответа {e}")
+					if tracker.command_response!={}:
+						logger.debug(f'WEBSOCKET command response\n{tracker.command_response}\n')
+						try:
+							await ws.send(tracker.command_response)
+						except Exception as e:
+							logger.error(f"WEBSOCKET ошибка при отправке ответа {e}\n")
 
-	    				tracker.command_response = {}
-	    			else:
-	    				await ws.send(dumps({"action":"response", "response": "Трекер не подключен"}).encode('ascii'))
-	    				logger.info(f"WEBSOCKET {rec['imei']} не подключен")
-	    				break
+						tracker.command_response = {}
 
-	    		else:
-	    			continue
+				else:
+					await ws.send(dumps({"action":"response", "response": "Трекер не подключен"}))
+					logger.info(f"WEBSOCKET {rec['imei']} не подключен\n")
+					continue
 
-    		except Exception as e:
-    			logger.info(e)
-    			break
+			else:
+				continue
+
+		except Exception as e:
+			logger.info(e)
+			break
 
 
 
@@ -70,17 +72,20 @@ def check_log_size():
 
 
 if __name__=="__main__":
-	p = os.path.join('tracker_receiver/src/', 'servers.json')
-	with open(p, 'r') as s:
-		servers = load(s)
+	# p = os.path.join('tracker_receiver/src/', 'servers.json')
+	# with open(p, 'r') as s:
+	# 	servers = load(s)
 
-	for protocol, x in servers.items():
-		if isinstance(x, dict):
-			for model, ipport in x.items():
-				TrackerServer(protocols[protocol], ipport, model)
+	# for protocol, x in servers.items():
+	# 	if isinstance(x, dict):
+	# 		for model, ipport in x.items():
+	# 			TrackerServer(protocols[protocol], ipport, model)
 
-		else:
-			TrackerServer(protocols[protocol], x)
+	# 	else:
+	# 		TrackerServer(protocols[protocol], x)
 
-	threading.Thread(target=check_log_size).start()
-	asyncio.get_event_loop().run_until_complete(handler())
+	# threading.Thread(target=check_log_size).start()
+
+	start_server = websockets.serve(handler, "127.0.0.1", 5678)
+	asyncio.get_event_loop().run_until_complete(start_server)
+	asyncio.get_event_loop().run_forever()

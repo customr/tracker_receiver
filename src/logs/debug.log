@@ -1,0 +1,830 @@
+INFO :: RECEIVER START
+
+
+
+ 2020-07-15 14:33:10,975
+---------------
+DEBUG :: Using proactor: IocpProactor 2020-07-15 14:33:11,475
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:33:19,515
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=840>) 2020-07-15 14:33:19,516
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:33:19,518
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:33:19,519
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', 'oCcHhceutM+Lwa4oSOxImQ=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:33:19,520
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:33:19,523
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 'vYqU+8BRkmYgZxtodc2RSASBty4='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:33:19 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:33:19,523
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:33:19,524
+---------------
+DEBUG :: server - event = data_received(<58 bytes>) 2020-07-15 14:33:27,123
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"345345","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:27,123
+---------------
+DEBUG :: server > Frame(fin=True, opcode=2, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:27,124
+---------------
+INFO :: WEBSOCKET 345345 не подключен
+ 2020-07-15 14:33:27,124
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xd7\x0cE\xd4', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:39,531
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:33:39,531
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xd7\x0cE\xd4', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:39,531
+---------------
+DEBUG :: server - received solicited pong: d70c45d4 2020-07-15 14:33:39,531
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:33:41,233
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=844>) 2020-07-15 14:33:41,234
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:33:41,235
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:33:41,236
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', 'hA7U90bQMEQn4aYAY4lFRQ=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:33:41,237
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:33:41,238
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', '9S3QvPBxsrhdrwKsXAX77ieLGpI='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:33:41 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:33:41,239
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:33:41,239
+---------------
+DEBUG :: server - event = data_received(<61 bytes>) 2020-07-15 14:33:45,982
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"134245345","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:45,982
+---------------
+DEBUG :: server > Frame(fin=True, opcode=2, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:45,983
+---------------
+INFO :: WEBSOCKET 134245345 не подключен
+ 2020-07-15 14:33:45,983
+---------------
+DEBUG :: server - event = data_received(<11 bytes>) 2020-07-15 14:33:50,496
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"345345","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:50,497
+---------------
+DEBUG :: server > Frame(fin=True, opcode=2, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:50,497
+---------------
+INFO :: WEBSOCKET 345345 не подключен
+ 2020-07-15 14:33:50,498
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xdf\x9fY\xd3', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:59,541
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:33:59,541
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xdf\x9fY\xd3', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:33:59,541
+---------------
+DEBUG :: server - received solicited pong: df9f59d3 2020-07-15 14:33:59,541
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xcb]\x97\\', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:01,252
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:34:01,252
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xcb]\x97\\', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:01,252
+---------------
+DEBUG :: server - received solicited pong: cb5d975c 2020-07-15 14:34:01,252
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'c<_\xe0', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:19,535
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:34:19,535
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'c<_\xe0', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:19,536
+---------------
+DEBUG :: server - received solicited pong: 633c5fe0 2020-07-15 14:34:19,536
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xd4\xab\x80\xa6', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:21,265
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:34:21,265
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xd4\xab\x80\xa6', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:21,265
+---------------
+DEBUG :: server - received solicited pong: d4ab80a6 2020-07-15 14:34:21,265
+---------------
+DEBUG :: server - event = data_received(<8 bytes>) 2020-07-15 14:34:30,758
+---------------
+DEBUG :: server < Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:30,758
+---------------
+DEBUG :: server - state = CLOSING 2020-07-15 14:34:30,758
+---------------
+DEBUG :: server > Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:30,758
+---------------
+DEBUG :: server - event = eof_received() 2020-07-15 14:34:30,767
+---------------
+DEBUG :: server x half-closing TCP connection 2020-07-15 14:34:30,767
+---------------
+DEBUG :: server - event = connection_lost(None) 2020-07-15 14:34:30,768
+---------------
+DEBUG :: server - state = CLOSED 2020-07-15 14:34:30,768
+---------------
+DEBUG :: server x code = 1001, reason = [no reason] 2020-07-15 14:34:30,769
+---------------
+INFO :: code = 1001 (going away), no reason 2020-07-15 14:34:30,769
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'M\x03M\x05', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:41,281
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:34:41,281
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'M\x03M\x05', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:41,281
+---------------
+DEBUG :: server - received solicited pong: 4d034d05 2020-07-15 14:34:41,281
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:34:49,393
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=848>) 2020-07-15 14:34:49,394
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:34:49,395
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:34:49,396
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', 'Uyqe3B8r5fzgPslTPTW5Kg=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:34:49,396
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:34:49,397
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 'oQxFvJ7OCuL+L5Weeb+bmVg7I2I='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:34:49 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:34:49,397
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:34:49,397
+---------------
+DEBUG :: server - event = data_received(<55 bytes>) 2020-07-15 14:34:53,619
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"asd","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:53,619
+---------------
+DEBUG :: server > Frame(fin=True, opcode=2, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:34:53,620
+---------------
+INFO :: WEBSOCKET asd не подключен
+ 2020-07-15 14:34:53,621
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xbe\xad\xdb\xda', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:01,281
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:35:01,281
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xbe\xad\xdb\xda', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:01,282
+---------------
+DEBUG :: server - received solicited pong: beaddbda 2020-07-15 14:35:01,282
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xdb8\x86\xb3', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:09,391
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:35:09,391
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xdb8\x86\xb3', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:09,392
+---------------
+DEBUG :: server - received solicited pong: db3886b3 2020-07-15 14:35:09,392
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'7\x93i\xd6', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:21,297
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:35:21,297
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'7\x93i\xd6', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:21,297
+---------------
+DEBUG :: server - received solicited pong: 379369d6 2020-07-15 14:35:21,297
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'n\x1e\xc2\x11', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:29,397
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:35:29,397
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'n\x1e\xc2\x11', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:29,397
+---------------
+DEBUG :: server - received solicited pong: 6e1ec211 2020-07-15 14:35:29,397
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\x1b+\xd9\x8e', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:41,319
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:35:41,319
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\x1b+\xd9\x8e', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:41,319
+---------------
+DEBUG :: server - received solicited pong: 1b2bd98e 2020-07-15 14:35:41,319
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\x9e\xb2\xf7(', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:49,412
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:35:49,412
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\x9e\xb2\xf7(', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:35:49,412
+---------------
+DEBUG :: server - received solicited pong: 9eb2f728 2020-07-15 14:35:49,412
+---------------
+INFO :: RECEIVER START
+
+
+
+ 2020-07-15 14:37:17,222
+---------------
+DEBUG :: Using proactor: IocpProactor 2020-07-15 14:37:17,269
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:37:19,821
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=832>) 2020-07-15 14:37:19,822
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:37:19,823
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:37:19,824
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', 'G3KraA7OTAq56AvxA5NvVA=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:37:19,824
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:37:19,825
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', '+LZ9GzXkN3pPD2XD1FmynsGwsnc='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:37:19 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:37:19,826
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:37:19,826
+---------------
+DEBUG :: server - event = data_received(<58 bytes>) 2020-07-15 14:37:24,536
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"234234","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:37:24,536
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:37:24,537
+---------------
+INFO :: WEBSOCKET 234234 не подключен
+ 2020-07-15 14:37:24,537
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\x1c\xfa\xb1\x89', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:37:39,843
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:37:39,843
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\x1c\xfa\xb1\x89', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:37:39,843
+---------------
+DEBUG :: server - received solicited pong: 1cfab189 2020-07-15 14:37:39,843
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\x89_\xa0J', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:37:59,858
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:37:59,858
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\x89_\xa0J', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:37:59,858
+---------------
+DEBUG :: server - received solicited pong: 895fa04a 2020-07-15 14:37:59,858
+---------------
+DEBUG :: server - event = data_received(<8 bytes>) 2020-07-15 14:38:07,433
+---------------
+DEBUG :: server < Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:07,434
+---------------
+DEBUG :: server - state = CLOSING 2020-07-15 14:38:07,434
+---------------
+DEBUG :: server > Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:07,435
+---------------
+DEBUG :: server - event = eof_received() 2020-07-15 14:38:07,435
+---------------
+DEBUG :: server x half-closing TCP connection 2020-07-15 14:38:07,436
+---------------
+DEBUG :: server - event = connection_lost(None) 2020-07-15 14:38:07,436
+---------------
+DEBUG :: server - state = CLOSED 2020-07-15 14:38:07,437
+---------------
+DEBUG :: server x code = 1001, reason = [no reason] 2020-07-15 14:38:07,437
+---------------
+INFO :: code = 1001 (going away), no reason 2020-07-15 14:38:07,438
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:38:07,570
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=892>) 2020-07-15 14:38:07,571
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:38:07,572
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:38:07,573
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', 'VpYNkgxRmkhgf77+bIJnmw=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:38:07,573
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:38:07,574
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 'CGT9QR04RYwSp+IgFISrmG4fbVY='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:38:07 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:38:07,575
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:38:07,575
+---------------
+DEBUG :: server - event = data_received(<57 bytes>) 2020-07-15 14:38:10,474
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"4234","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:10,474
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:10,475
+---------------
+INFO :: WEBSOCKET 4234 не подключен
+ 2020-07-15 14:38:10,475
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xe3\xb3\xad\xf6', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:27,595
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:27,595
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xe3\xb3\xad\xf6', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:27,595
+---------------
+DEBUG :: server - received solicited pong: e3b3adf6 2020-07-15 14:38:27,595
+---------------
+DEBUG :: server - event = data_received(<8 bytes>) 2020-07-15 14:38:43,763
+---------------
+DEBUG :: server < Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:43,765
+---------------
+DEBUG :: server - state = CLOSING 2020-07-15 14:38:43,765
+---------------
+DEBUG :: server > Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:43,765
+---------------
+DEBUG :: server - event = eof_received() 2020-07-15 14:38:43,766
+---------------
+DEBUG :: server x half-closing TCP connection 2020-07-15 14:38:43,766
+---------------
+DEBUG :: server - event = connection_lost(None) 2020-07-15 14:38:43,767
+---------------
+DEBUG :: server - state = CLOSED 2020-07-15 14:38:43,767
+---------------
+DEBUG :: server x code = 1001, reason = [no reason] 2020-07-15 14:38:43,767
+---------------
+INFO :: code = 1001 (going away), no reason 2020-07-15 14:38:43,768
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:38:43,827
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=708>) 2020-07-15 14:38:43,828
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:38:43,830
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:38:43,831
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', '2tzu3vxtZ8iFdW3CvuxWXg=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:38:43,831
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:38:43,833
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 'h49wHYpyuN7LCp0fJRCx12ZYOvY='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:38:43 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:38:43,834
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:38:43,834
+---------------
+DEBUG :: server - event = data_received(<58 bytes>) 2020-07-15 14:38:46,200
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"234234","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:46,200
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:46,201
+---------------
+INFO :: WEBSOCKET 234234 не подключен
+ 2020-07-15 14:38:46,202
+---------------
+DEBUG :: server - event = data_received(<11 bytes>) 2020-07-15 14:38:49,893
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"234234","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:49,893
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:49,894
+---------------
+INFO :: WEBSOCKET 234234 не подключен
+ 2020-07-15 14:38:49,895
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:50,111
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"234234","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:50,112
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:50,112
+---------------
+INFO :: WEBSOCKET 234234 не подключен
+ 2020-07-15 14:38:50,113
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:50,274
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"234234","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:50,275
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:50,275
+---------------
+INFO :: WEBSOCKET 234234 не подключен
+ 2020-07-15 14:38:50,276
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:50,442
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"234234","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:50,443
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:50,443
+---------------
+INFO :: WEBSOCKET 234234 не подключен
+ 2020-07-15 14:38:50,444
+---------------
+DEBUG :: server - event = data_received(<8 bytes>) 2020-07-15 14:38:56,367
+---------------
+DEBUG :: server < Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:56,368
+---------------
+DEBUG :: server - state = CLOSING 2020-07-15 14:38:56,368
+---------------
+DEBUG :: server > Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:56,369
+---------------
+DEBUG :: server - event = eof_received() 2020-07-15 14:38:56,369
+---------------
+DEBUG :: server x half-closing TCP connection 2020-07-15 14:38:56,370
+---------------
+DEBUG :: server - event = connection_lost(None) 2020-07-15 14:38:56,370
+---------------
+DEBUG :: server - state = CLOSED 2020-07-15 14:38:56,370
+---------------
+DEBUG :: server x code = 1001, reason = [no reason] 2020-07-15 14:38:56,371
+---------------
+INFO :: code = 1001 (going away), no reason 2020-07-15 14:38:56,371
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:38:56,442
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=868>) 2020-07-15 14:38:56,443
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:38:56,444
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:38:56,445
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', '9Q75XUHRHRtDVc3I+yVq6g=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:38:56,445
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:38:56,447
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 'ROw6QztD+mtrVgakLBT1xi1E3T4='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:38:56 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:38:56,448
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:38:56,449
+---------------
+DEBUG :: server - event = data_received(<52 bytes>) 2020-07-15 14:38:58,039
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:58,040
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:58,041
+---------------
+INFO :: WEBSOCKET  не подключен
+ 2020-07-15 14:38:58,041
+---------------
+DEBUG :: server - event = data_received(<18 bytes>) 2020-07-15 14:38:58,965
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:58,966
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:58,966
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:38:58,967
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:59,255
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,256
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,256
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:38:59,257
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:59,427
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,428
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,428
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:38:59,429
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:59,576
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,577
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,577
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:38:59,578
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:59,717
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,718
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,718
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:38:59,719
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:38:59,853
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,854
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:38:59,854
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:38:59,855
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:39:00,329
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:00,330
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:00,330
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:39:00,331
+---------------
+DEBUG :: server - event = data_received(<19 bytes>) 2020-07-15 14:39:05,838
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":"getinfo"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:05,839
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:05,839
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:39:05,840
+---------------
+DEBUG :: server - event = data_received(<11 bytes>) 2020-07-15 14:39:06,178
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":"getinfo"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:06,178
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:06,179
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:39:06,180
+---------------
+DEBUG :: server - event = data_received(<11 bytes>) 2020-07-15 14:39:06,314
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"sdfg","codec":"12","command":"getinfo"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:06,314
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:06,315
+---------------
+INFO :: WEBSOCKET sdfg не подключен
+ 2020-07-15 14:39:06,316
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\x028\x14}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:16,466
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:39:16,466
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\x028\x14}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:39:16,466
+---------------
+DEBUG :: server - received solicited pong: 0238147d 2020-07-15 14:39:16,466
+---------------
+INFO :: RECEIVER START
+
+
+
+ 2020-07-15 14:41:16,054
+---------------
+DEBUG :: Using proactor: IocpProactor 2020-07-15 14:41:16,101
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:41:18,239
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=804>) 2020-07-15 14:41:18,240
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:41:18,241
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:41:18,242
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', 'JccMogftOq+NJR/9R48G3A=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:41:18,242
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:41:18,245
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 'SLKrLcaHh0Q3I8Mjlei8clD4FpI='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:41:18 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:41:18,245
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:41:18,246
+---------------
+DEBUG :: server - event = data_received(<58 bytes>) 2020-07-15 14:41:19,881
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"23423","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:19,881
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:19,882
+---------------
+INFO :: WEBSOCKET 23423 не подключен
+ 2020-07-15 14:41:19,883
+---------------
+DEBUG :: server - event = data_received(<11 bytes>) 2020-07-15 14:41:20,758
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"23423","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:20,759
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:20,759
+---------------
+INFO :: WEBSOCKET 23423 не подключен
+ 2020-07-15 14:41:20,760
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:41:20,947
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"23423","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:20,948
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:20,948
+---------------
+INFO :: WEBSOCKET 23423 не подключен
+ 2020-07-15 14:41:20,949
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:41:21,111
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"23423","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:21,112
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:21,112
+---------------
+INFO :: WEBSOCKET 23423 не подключен
+ 2020-07-15 14:41:21,113
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:41:21,254
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"23423","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:21,255
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:21,255
+---------------
+INFO :: WEBSOCKET 23423 не подключен
+ 2020-07-15 14:41:21,256
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:41:21,381
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"23423","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:21,382
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:21,382
+---------------
+INFO :: WEBSOCKET 23423 не подключен
+ 2020-07-15 14:41:21,383
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xdd\x81\\\xc4', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:38,273
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:41:38,273
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xdd\x81\\\xc4', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:38,273
+---------------
+DEBUG :: server - received solicited pong: dd815cc4 2020-07-15 14:41:38,273
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\x94;\xd8\x90', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:58,285
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:41:58,285
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\x94;\xd8\x90', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:41:58,285
+---------------
+DEBUG :: server - received solicited pong: 943bd890 2020-07-15 14:41:58,285
+---------------
+DEBUG :: server - event = data_received(<8 bytes>) 2020-07-15 14:42:05,920
+---------------
+DEBUG :: server < Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:05,921
+---------------
+DEBUG :: server - state = CLOSING 2020-07-15 14:42:05,921
+---------------
+DEBUG :: server > Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:05,921
+---------------
+DEBUG :: server - event = eof_received() 2020-07-15 14:42:05,921
+---------------
+DEBUG :: server x half-closing TCP connection 2020-07-15 14:42:05,922
+---------------
+DEBUG :: server - event = connection_lost(None) 2020-07-15 14:42:05,922
+---------------
+DEBUG :: server - state = CLOSED 2020-07-15 14:42:05,922
+---------------
+DEBUG :: server x code = 1001, reason = [no reason] 2020-07-15 14:42:05,922
+---------------
+INFO :: code = 1001 (going away), no reason 2020-07-15 14:42:05,922
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:42:06,049
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=864>) 2020-07-15 14:42:06,050
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:42:06,050
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:42:06,051
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', 'Pi03LbJJB3bwWmMVm0wj+w=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:42:06,052
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:42:06,053
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 'hPhcC9jpeQZ9MpIptKLDOYjEsjs='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:42:06 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:42:06,053
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:42:06,053
+---------------
+DEBUG :: server - event = data_received(<56 bytes>) 2020-07-15 14:42:07,340
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"2342","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:07,340
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:07,341
+---------------
+INFO :: WEBSOCKET 2342 не подключен
+ 2020-07-15 14:42:07,341
+---------------
+DEBUG :: server - event = data_received(<11 bytes>) 2020-07-15 14:42:08,517
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"2342","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:08,517
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:08,518
+---------------
+INFO :: WEBSOCKET 2342 не подключен
+ 2020-07-15 14:42:08,518
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:42:09,163
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"2342","codec":"12","command":""}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:09,163
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:09,164
+---------------
+INFO :: WEBSOCKET 2342 не подключен
+ 2020-07-15 14:42:09,164
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xd1 \xfdQ', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:26,058
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:42:26,058
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xd1 \xfdQ', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:26,058
+---------------
+DEBUG :: server - received solicited pong: d120fd51 2020-07-15 14:42:26,058
+---------------
+DEBUG :: server - event = data_received(<8 bytes>) 2020-07-15 14:42:33,600
+---------------
+DEBUG :: server < Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:33,602
+---------------
+DEBUG :: server - state = CLOSING 2020-07-15 14:42:33,602
+---------------
+DEBUG :: server > Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:33,603
+---------------
+DEBUG :: server - event = eof_received() 2020-07-15 14:42:33,604
+---------------
+DEBUG :: server x half-closing TCP connection 2020-07-15 14:42:33,604
+---------------
+DEBUG :: server - event = connection_lost(None) 2020-07-15 14:42:33,605
+---------------
+DEBUG :: server - state = CLOSED 2020-07-15 14:42:33,605
+---------------
+DEBUG :: server x code = 1001, reason = [no reason] 2020-07-15 14:42:33,605
+---------------
+INFO :: code = 1001 (going away), no reason 2020-07-15 14:42:33,606
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:42:33,692
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=700>) 2020-07-15 14:42:33,693
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:42:33,694
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:42:33,695
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', 'Kyc7gcOmXFyT2AmNwrnVpA=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:42:33,695
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:42:33,696
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 't8BY0oswLpEya59hLSX2t7JRqCE='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:42:33 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:42:33,697
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:42:33,698
+---------------
+DEBUG :: server - event = data_received(<62 bytes>) 2020-07-15 14:42:38,531
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"23423","codec":"12","command":"erte"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:38,532
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:38,532
+---------------
+INFO :: WEBSOCKET 23423 не подключен
+ 2020-07-15 14:42:38,533
+---------------
+DEBUG :: server - event = data_received(<12 bytes>) 2020-07-15 14:42:39,429
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"23423","codec":"12","command":"erte"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:39,430
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:39,430
+---------------
+INFO :: WEBSOCKET 23423 не подключен
+ 2020-07-15 14:42:39,431
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'"\xb8>\x12', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:53,710
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:42:53,710
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'"\xb8>\x12', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:42:53,710
+---------------
+DEBUG :: server - received solicited pong: 22b83e12 2020-07-15 14:42:53,710
+---------------
+DEBUG :: server - event = data_received(<8 bytes>) 2020-07-15 14:43:04,553
+---------------
+DEBUG :: server < Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:43:04,554
+---------------
+DEBUG :: server - state = CLOSING 2020-07-15 14:43:04,554
+---------------
+DEBUG :: server > Frame(fin=True, opcode=8, data=b'\x03\xe9', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:43:04,554
+---------------
+DEBUG :: server - event = eof_received() 2020-07-15 14:43:04,555
+---------------
+DEBUG :: server x half-closing TCP connection 2020-07-15 14:43:04,555
+---------------
+DEBUG :: server - event = connection_lost(None) 2020-07-15 14:43:04,556
+---------------
+DEBUG :: server - state = CLOSED 2020-07-15 14:43:04,556
+---------------
+DEBUG :: server x code = 1001, reason = [no reason] 2020-07-15 14:43:04,557
+---------------
+INFO :: code = 1001 (going away), no reason 2020-07-15 14:43:04,558
+---------------
+DEBUG :: server - state = CONNECTING 2020-07-15 14:43:04,684
+---------------
+DEBUG :: server - event = connection_made(<_ProactorSocketTransport fd=808>) 2020-07-15 14:43:04,685
+---------------
+DEBUG :: server - event = data_received(<516 bytes>) 2020-07-15 14:43:04,688
+---------------
+DEBUG :: server < GET / HTTP/1.1 2020-07-15 14:43:04,689
+---------------
+DEBUG :: server < Headers([('Host', '127.0.0.1:5678'), ('Connection', 'Upgrade'), ('Pragma', 'no-cache'), ('Cache-Control', 'no-cache'), ('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.101 YaBrowser/20.7.0.894 Yowser/2.5 Safari/537.36'), ('Upgrade', 'websocket'), ('Origin', 'file://'), ('Sec-WebSocket-Version', '13'), ('Accept-Encoding', 'gzip, deflate, sdch, br'), ('Accept-Language', 'ru,en;q=0.9'), ('Sec-WebSocket-Key', '6+xjAblXrhGk5HfrovnVzg=='), ('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits')]) 2020-07-15 14:43:04,689
+---------------
+DEBUG :: server > HTTP/1.1 101 Switching Protocols 2020-07-15 14:43:04,691
+---------------
+DEBUG :: server > Headers([('Upgrade', 'websocket'), ('Connection', 'Upgrade'), ('Sec-WebSocket-Accept', 'vu01COO0K1Og9ApUyf/dUQw0Bps='), ('Sec-WebSocket-Extensions', 'permessage-deflate'), ('Date', 'Wed, 15 Jul 2020 10:43:04 GMT'), ('Server', 'Python/3.8 websockets/8.1')]) 2020-07-15 14:43:04,692
+---------------
+DEBUG :: server - state = OPEN 2020-07-15 14:43:04,692
+---------------
+DEBUG :: server - event = data_received(<59 bytes>) 2020-07-15 14:43:07,473
+---------------
+DEBUG :: server < Frame(fin=True, opcode=1, data=b'{"action":"command","imei":"234","codec":"12","command":"fsd"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:43:07,474
+---------------
+DEBUG :: server > Frame(fin=True, opcode=1, data=b'{"action": "response", "response": "\\u0422\\u0440\\u0435\\u043a\\u0435\\u0440 \\u043d\\u0435 \\u043f\\u043e\\u0434\\u043a\\u043b\\u044e\\u0447\\u0435\\u043d"}', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:43:07,474
+---------------
+INFO :: WEBSOCKET 234 не подключен
+ 2020-07-15 14:43:07,475
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xeb\xb5*\x19', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:43:24,712
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:43:24,712
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xeb\xb5*\x19', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:43:24,712
+---------------
+DEBUG :: server - received solicited pong: ebb52a19 2020-07-15 14:43:24,712
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\xd3_\xae&', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:43:44,727
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:43:44,727
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\xd3_\xae&', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:43:44,727
+---------------
+DEBUG :: server - received solicited pong: d35fae26 2020-07-15 14:43:44,727
+---------------
+DEBUG :: server > Frame(fin=True, opcode=9, data=b'\x84\xab\xffE', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:44:04,733
+---------------
+DEBUG :: server - event = data_received(<10 bytes>) 2020-07-15 14:44:04,733
+---------------
+DEBUG :: server < Frame(fin=True, opcode=10, data=b'\x84\xab\xffE', rsv1=False, rsv2=False, rsv3=False) 2020-07-15 14:44:04,733
+---------------
+DEBUG :: server - received solicited pong: 84abff45 2020-07-15 14:44:04,733
+---------------
