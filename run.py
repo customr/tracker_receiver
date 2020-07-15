@@ -72,19 +72,19 @@ def check_log_size():
 
 
 if __name__=="__main__":
-	# p = os.path.join('tracker_receiver/src/', 'servers.json')
-	# with open(p, 'r') as s:
-	# 	servers = load(s)
+	p = os.path.join('tracker_receiver/src/', 'servers.json')
+	with open(p, 'r') as s:
+		servers = load(s)
 
-	# for protocol, x in servers.items():
-	# 	if isinstance(x, dict):
-	# 		for model, ipport in x.items():
-	# 			TrackerServer(protocols[protocol], ipport, model)
+	for protocol, x in servers.items():
+		if isinstance(x, dict):
+			for model, ipport in x.items():
+				TrackerServer(protocols[protocol], ipport, model)
 
-	# 	else:
-	# 		TrackerServer(protocols[protocol], x)
+		else:
+			TrackerServer(protocols[protocol], x)
 
-	# threading.Thread(target=check_log_size).start()
+	threading.Thread(target=check_log_size).start()
 
 	start_server = websockets.serve(handler, "127.0.0.1", 5678)
 	asyncio.get_event_loop().run_until_complete(start_server)
