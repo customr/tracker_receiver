@@ -8,10 +8,12 @@ from json import load, loads, dumps
 
 from src.server import TrackerServer
 from src.protocols.Teltonika import Teltonika
+from src.protocols.Flex import Flex
 from src.logs.log_config import logger
 
 protocols = {
 	'teltonika': Teltonika.Teltonika
+	'flex': Flex.Flex
 }
 
 
@@ -56,6 +58,8 @@ async def handler(ws, path):
 
 		except Exception as e:
 			logger.info(e)
+			sleep(5)
+			start_wsserver()
 			break
 
 
@@ -69,6 +73,12 @@ def check_log_size():
 			open('tracker_receiver/src/logs/debug.log', 'w').close()
 
 		sleep(60*60*1)
+
+
+def start_wsserver():
+	start_server = websockets.serve(handler, "127.0.0.1", 5678)
+	asyncio.get_event_loop().run_until_complete(start_server)
+	asyncio.get_event_loop().run_forever()
 
 
 if __name__=="__main__":
@@ -85,7 +95,4 @@ if __name__=="__main__":
 			TrackerServer(protocols[protocol], x)
 
 	threading.Thread(target=check_log_size).start()
-
-	start_server = websockets.serve(handler, "127.0.0.1", 5678)
-	asyncio.get_event_loop().run_until_complete(start_server)
-	asyncio.get_event_loop().run_forever()
+	start_wsserver()

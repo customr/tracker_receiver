@@ -99,3 +99,31 @@ def add_float(packet, value):
 
 def add_double(packet, value):
 	return add_x(packet, 'd', value)
+
+
+def prepare_geo(records):
+	all_geo = []
+	for data in records:
+		data['iodata'].update({"sat_num": data['sat_num']})
+		reserve = str(data['iodata']).replace("'", '"').replace(' ', '')
+		reserve = reserve[1:-1]
+
+		geo = {
+			'imei': data['imei'],
+			'lat': float('{:.6f}'.format(data['lat'])),
+			'lon': float('{:.6f}'.format(data['lon'])),
+			'datetime': data['datetime'],
+			'type': 0,
+			'speed': data['speed'],
+			'direction': data['direction'],
+			'bat': 0,
+			'fuel': 0,
+			'ignition': data['iodata'].get('ignition', 0),
+			'sensor': data['iodata'].get('sensor', 0),
+			'reserve': reserve,
+			'ts': data['ts']
+		}
+
+		all_geo.append(geo)
+
+	return all_geo

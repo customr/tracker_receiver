@@ -27,6 +27,7 @@
         border-width: 1px;
         width: 15ch;
         background-color: #57565f;
+        color: white;
     }
     input[type='button']{
         margin: 5px;
@@ -177,6 +178,7 @@
         }
         ws.onclose = (e) => {
             console.log(e)
+            ws = new WebSocket("ws://127.0.0.1:5678/");
             document.querySelector('#result').value += `WebSocket закрыл соединение${sep}`
         }
 
