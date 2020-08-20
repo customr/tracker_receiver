@@ -199,7 +199,9 @@
             }else{
                 for (let com of commands.split('\n')){
                     document.querySelector('#result').value += `%COMMAND% ${imei} ${com}\n`
-                    ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: com}))
+                    if (com!=''){
+                    	ws.send(JSON.stringify({action: "command", imei: imei, codec: codec, command: com}))
+                	}
                 }
             }
         }

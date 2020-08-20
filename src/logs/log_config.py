@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 
 PATH = "tracker_receiver/src/logs/"
 LEVEL = logging.DEBUG
-frt = logging.Formatter('%(levelname)s :: %(message)s %(asctime)s\n'+'-'*15)
+frt = logging.Formatter('[%(asctime)s] %(levelname)s :: %(message)s\n'+'-'*15)
 
 logger = logging.getLogger()
 logger.setLevel(LEVEL)

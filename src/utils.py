@@ -14,43 +14,46 @@ def extract_x(packet, letter, length):
 	packet, extracted = extract(packet, length)
 	extracted = binascii.a2b_hex(extracted)
 	try:
-		x = struct.unpack(f"!{letter}", extracted)[0]
+		x = struct.unpack(f"{letter}", extracted)[0]
 	except Exception as e:
 		logger.critical(f'Ошибка в распаковке: len={length} {letter} {extracted}\n{e}')
 		raise e
 
 	return packet, x
 
-def extract_str(packet, length):
-	return extract_x(packet, f'{length}s', length)
+def extract_str(packet, length, bdir='!'):
+	return extract_x(packet, f'{bdir}{length}s', length)
 
-def extract_byte(packet):
-	return extract_x(packet, 'b', 1)
+def extract_byte(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}b', 1)
 
-def extract_ubyte(packet):
-	return extract_x(packet, 'B', 1)
+def extract_ubyte(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}B', 1)
 
-def extract_short(packet):
-	return extract_x(packet, 'h', 2)
+def extract_short(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}h', 2)
 
-def extract_ushort(packet):
-	return extract_x(packet, 'H', 2)
+def extract_ushort(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}H', 2)
 
-def extract_int(packet):
-	return extract_x(packet, 'i', 4)
+def extract_int(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}i', 4)
  
-def extract_uint(packet):
-	return extract_x(packet, 'I', 4)
+def extract_uint(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}I', 4)
 
-def extract_longlong(packet):
-	return extract_x(packet, 'q', 8)
+def extract_long(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}l', 4)
 
-def extract_float(packet):
-	packet, extracted = extract_x(packet, 'f', 4)
+def extract_longlong(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}q', 8)
+
+def extract_float(packet, bdir='!'):
+	packet, extracted = extract_x(packet, f'{bdir}f', 4)
 	return packet, round(extracted, 3)
 
-def extract_double(packet):
-	packet, extracted = extract_x(packet, 'd', 8)
+def extract_double(packet, bdir='!'):
+	packet, extracted = extract_x(packet, f'{bdir}d', 8)
 	return packet, round(extracted, 3)
 
 def unpack_from_bytes(fmt, packet):
@@ -101,29 +104,3 @@ def add_double(packet, value):
 	return add_x(packet, 'd', value)
 
 
-def prepare_geo(records):
-	all_geo = []
-	for data in records:
-		data['iodata'].update({"sat_num": data['sat_num']})
-		reserve = str(data['iodata']).replace("'", '"').replace(' ', '')
-		reserve = reserve[1:-1]
-
-		geo = {
-			'imei': data['imei'],
-			'lat': float('{:.6f}'.format(data['lat'])),
-			'lon': float('{:.6f}'.format(data['lon'])),
-			'datetime': data['datetime'],
-			'type': 0,
-			'speed': data['speed'],
-			'direction': data['direction'],
-			'bat': 0,
-			'fuel': 0,
-			'ignition': data['iodata'].get('ignition', 0),
-			'sensor': data['iodata'].get('sensor', 0),
-			'reserve': reserve,
-			'ts': data['ts']
-		}
-
-		all_geo.append(geo)
-
-	return all_geo

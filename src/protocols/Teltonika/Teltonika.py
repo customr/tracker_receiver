@@ -32,7 +32,7 @@ class Teltonika:
 		logger.info(f'Teltonika{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
 		Teltonika.TRACKERS.add(self)
 
-		self.assign = get_configuration(self.imei, self.model)
+		self.assign = get_configuration(self.NAME, self.imei, self.model)
 		self.decoder = self.get_decoder(self.model)
 		self.ign_v = get_ignition_v(self.imei)
 		
@@ -80,6 +80,7 @@ class Teltonika:
 				self.sock.close()
 				self.stop = True
 				Teltonika.TRACKERS.remove(self)
+				logger.debug(f'[Teltonika{self.model}] {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
 				break
 
 			self.lock.acquire()
@@ -93,6 +94,7 @@ class Teltonika:
 					self.sock.close()
 					self.stop = True
 					Teltonika.TRACKERS.remove(self)
+					logger.debug(f'[Teltonika{self.model}] {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
 					break
 
 			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
@@ -328,7 +330,13 @@ class Teltonika:
 
 				else:
 					if str(io_id) in self.assign.keys():
-						iodata.update({self.assign[str(io_id)]: io_val})
+						ikey = self.assign[str(io_id)]
+						if '*' in ikey:
+							spl = ikey.split('*')
+							ikey, k = spl[0], spl[1]
+							io_val = round(io_val*float(k), 4)
+
+						iodata.update({ikey: io_val})
 
 					elif self.decoder[str(io_id)] in self.assign.keys():
 						ikey = self.assign[self.decoder[str(io_id)]]
@@ -363,7 +371,13 @@ class Teltonika:
 
 				else:
 					if str(io_id) in self.assign.keys():
-						iodata.update({self.assign[str(io_id)]: io_val})
+						ikey = self.assign[str(io_id)]
+						if '*' in ikey:
+							spl = ikey.split('*')
+							ikey, k = spl[0], spl[1]
+							io_val = round(io_val*float(k), 4)
+
+						iodata.update({ikey: io_val})
 
 					elif self.decoder[str(io_id)] in self.assign.keys():
 						ikey = self.assign[self.decoder[str(io_id)]]
@@ -401,3 +415,31 @@ class Teltonika:
 				return t
 
 		return None
+
+
+def prepare_geo(records):
+	all_geo = []
+	for data in records:
+		data['iodata'].update({"sat_num": data['sat_num']})
+		reserve = str(data['iodata']).replace("'", '"').replace(' ', '')
+		reserve = reserve[1:-1]
+
+		geo = {
+			'imei': data['imei'],
+			'lat': float('{:.6f}'.format(data['lat'])),
+			'lon': float('{:.6f}'.format(data['lon'])),
+			'datetime': data['datetime'],
+			'type': 0,
+			'speed': data['speed'],
+			'direction': data['direction'],
+			'bat': 0,
+			'fuel': 0,
+			'ignition': data['iodata'].get('ignition', 0),
+			'sensor': data['iodata'].get('sensor', 0),
+			'reserve': reserve,
+			'ts': data['ts']
+		}
+
+		all_geo.append(geo)
+
+	return all_geo

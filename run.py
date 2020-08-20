@@ -8,12 +8,12 @@ from json import load, loads, dumps
 
 from src.server import TrackerServer
 from src.protocols.Teltonika import Teltonika
-from src.protocols.Flex import Flex
+from src.protocols.Wialon import Wialon
 from src.logs.log_config import logger
 
 protocols = {
-	'teltonika': Teltonika.Teltonika
-	'flex': Flex.Flex
+	'teltonika': Teltonika.Teltonika,
+	'wialon': Wialon.Wialon
 }
 
 
@@ -58,8 +58,6 @@ async def handler(ws, path):
 
 		except Exception as e:
 			logger.info(e)
-			sleep(5)
-			start_wsserver()
 			break
 
 
@@ -76,7 +74,7 @@ def check_log_size():
 
 
 def start_wsserver():
-	start_server = websockets.serve(handler, "127.0.0.1", 5678)
+	start_server = websockets.serve(handler, "127.0.0.1", 5678, ping_interval=None)
 	asyncio.get_event_loop().run_until_complete(start_server)
 	asyncio.get_event_loop().run_forever()
 
