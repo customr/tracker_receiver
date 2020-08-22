@@ -47,18 +47,18 @@ def get_configuration(protocol_name, imei, d_model=None):
 
 				ins_settings = str(settings).replace("'", '"')
 				if model:
-					query = f"INSERT INTO `receiver_settings` VALUES ({int(imei)}, '{model}', '{ins_settings}')"
+					query = f"INSERT INTO `receiver_settings` VALUES ({pid}, {int(imei)}, '{model}', '{ins_settings}')"
 				else:
-					query = f"INSERT INTO `receiver_settings` VALUES ({int(imei)}, NULL, '{ins_settings}')"
+					query = f"INSERT INTO `receiver_settings` VALUES ({pid}, {int(imei)}, NULL, '{ins_settings}')"
 				
 				cursor.execute(query)
 				connection.commit()
 
 			else:
-				params = loads(x['settings'])
+				settings = loads(x['settings'])
 				model = x['model']
 
-		return params
+		return settings
 
 
 def insert_geo(data, debug=False):
