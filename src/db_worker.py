@@ -15,8 +15,19 @@ PROTOCOLS = (
 
 PROTOCOLS_IDS = {k:v for k, v in zip(PROTOCOLS, range(1,len(PROTOCOLS)+1))}
 
-def get_ignition_v(imei):
-	with closing(pymysql.connect(**CONN)) as connection:
+conf_cache = {}
+ign_cache = {}
+upd_const = 20
+
+def get_ignition_v(connection, imei):
+	ign = ign_cache.get(str(imei))
+
+	update = False
+	if ign:
+		if ign[1]>upd_const:
+			update = True
+
+	if not ign or update:
 		query = f'SELECT `ignition_v` from `devices` WHERE `imei`={int(imei)}'
 		with connection.cursor() as cursor:
 			cursor.execute(query)
@@ -25,11 +36,24 @@ def get_ignition_v(imei):
 			except Exception:
 				return None
 
-		return ign_v
+		ign_cache[str(imei)] = [ign_v, 0]
+	else:
+		ign_v, count = ign_cache[str(imei)]
+		ign_cache[str(imei)] = [ign_v, count+1]
+
+	return ign_v
 
 
-def get_configuration(protocol_name, imei, d_model=None):
-	with closing(pymysql.connect(**CONN)) as connection:
+def get_configuration(connection, protocol_name, imei, d_model=None):
+	key = f'{protocol_name}{imei}'
+	conf = conf_cache.get(key)
+
+	update = False
+	if conf:
+		if conf[1]>upd_const:
+			update = True
+
+	if not conf or update:
 		pid = PROTOCOLS_IDS[protocol_name.lower()]
 		query = f'SELECT `settings`, `model` from `receiver_settings` WHERE `protocol`={pid} AND `imei`={int(imei)}'
 		with connection.cursor() as cursor:
@@ -58,34 +82,38 @@ def get_configuration(protocol_name, imei, d_model=None):
 				settings = loads(x['settings'])
 				model = x['model']
 
-		return settings
+		conf_cache[key] = [settings, 0]
+	else:
+		settings, count = conf_cache[key]
+		conf_cache[key] = [settings, count+1]
+
+	return settings
 
 
-def insert_geo(data, debug=False):
-	with closing(pymysql.connect(**CONN)) as connection:
-		count = 0
-		for rec in data:
-			if not debug:
-				query = f'INSERT INTO `{RECORDS_TABLE}` ({GEO_COLUMNS}) VALUES ('
+def insert_geo(connection, data, debug=False):
+	count = 0
+	for rec in data:
+		if not debug:
+			query = f'INSERT INTO `{RECORDS_TABLE}` ({GEO_COLUMNS}) VALUES ('
+		else:
+			query = f'INSERT INTO `geo_test` ({GEO_COLUMNS}) VALUES ('
+
+		for name, value in rec.items():
+			if name in ('datetime', 'reserve', 'ts'):
+				query += f"'{value}',"
 			else:
-				query = f'INSERT INTO `geo_test` ({GEO_COLUMNS}) VALUES ('
+				query += f"{value},"
 
-			for name, value in rec.items():
-				if name in ('datetime', 'reserve', 'ts'):
-					query += f"'{value}',"
-				else:
-					query += f"{value},"
+		query = query[:-1]
+		query += ')'
+		with connection.cursor() as cursor:
+			try:
+				cursor.execute(query)
+				count += 1
+			except Exception as e:
+				with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
+					fd.write(f'Ошибка в mysql insert запросе {e}\n')
 
-			query = query[:-1]
-			query += ')'
-			with connection.cursor() as cursor:
-				try:
-					cursor.execute(query)
-					count += 1
-				except Exception as e:
-					with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
-						fd.write(f'Ошибка в mysql insert запросе {e}\n')
-
-			connection.commit()
+		connection.commit()
 
 	return count

@@ -10,6 +10,7 @@ from json import load, loads, dumps
 
 from src.utils import *
 from src.db_worker import *
+from src.db_connect import CONN
 from src.logs.log_config import logger
 
 
@@ -17,6 +18,7 @@ class Wialon:
 
 	BASE_PATH = 'tracker_receiver/src/protocols/Wialon/'
 	NAME = 'Wialon'
+	TRACKERS = set()
 
 	BLOCK_TYPES = {
 		1: 's',
@@ -36,13 +38,17 @@ class Wialon:
 
 	def start(self):
 		logger.info(f'Wialon подключен [{self.addr[0]}:{self.addr[1]}]')
+		Wialon.TRACKERS.add(self)
+		self.db = pymysql.connect(**CONN)
 
 		self.stop = False
-		main_th = threading.Thread(target=self.handle_packet)
-		main_th.start()
+		self.handle_packet()
 
 
 	def handle_packet(self):
+		if self.stop:
+			self.stop = False
+
 		self.assign = None
 		while not self.stop:
 			try:
@@ -53,15 +59,28 @@ class Wialon:
 				self.sock.close()
 				self.stop = True
 				self.success = False
+				Wialon.TRACKERS.remove(self)
 				logger.debug(f'[Wialon] отключен [{self.addr[0]}:{self.addr[1]}]')
 				break
+
+			if len(packet)<8:
+				if packet==b'\xff' or packet==b'' or packet==b'ff':
+					continue
+
+				else:
+					logger.error(f'[Wialon] непонятный пакет: {packet}')
+					self.sock.close()
+					self.stop = True
+					Wialon.TRACKERS.remove(self)
+					logger.debug(f'[Wialon {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
+					break
 
 			logger.debug(f'[Wialon] получен пакет:\n{packet}\n')
 			packet_size = len(packet)
 			packet, packet_header = self.handle_header(packet)
 
 			if not self.assign:
-				self.assign = get_configuration(self.NAME, packet_header['uid'])
+				self.assign = get_configuration(self.db, self.NAME, packet_header['uid'])
 
 			if packet_header['packet_size'] != (packet_size-7)//2:
 				logger.error(f"[Wialon] размер принятого пакета не сходится {packet_header['packet_size']}!={(packet_size-6)/2}")
@@ -71,7 +90,7 @@ class Wialon:
 			self.data, insert = self.prepare_data(packet_header, packet_data)
 
 			if insert:
-				count = insert_geo(self.data, debug=True)
+				count = insert_geo(self.db, self.data, debug=True)
 
 				if count==0:
 					self.success = False
