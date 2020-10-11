@@ -2,6 +2,7 @@ import pymysql
 
 from json import loads, load
 from contextlib import closing
+from time import time
 
 from src.db_connect import CONN, RECORDS_TABLE
 
@@ -17,14 +18,14 @@ PROTOCOLS_IDS = {k:v for k, v in zip(PROTOCOLS, range(1,len(PROTOCOLS)+1))}
 
 conf_cache = {}
 ign_cache = {}
-upd_const = 20
+upd_time_min = 20
 
 def get_ignition_v(connection, imei):
 	ign = ign_cache.get(str(imei))
 
 	update = False
 	if ign:
-		if ign[1]>upd_const:
+		if (time()-ign[1])/60>upd_time_min:
 			update = True
 
 	if not ign or update:
@@ -36,10 +37,9 @@ def get_ignition_v(connection, imei):
 			except Exception:
 				return None
 
-		ign_cache[str(imei)] = [ign_v, 0]
+		ign_cache[str(imei)] = [ign_v, time()]
 	else:
-		ign_v, count = ign_cache[str(imei)]
-		ign_cache[str(imei)] = [ign_v, count+1]
+		ign_v, _ = ign_cache[str(imei)]
 
 	return ign_v
 
@@ -50,7 +50,7 @@ def get_configuration(connection, protocol_name, imei, d_model=None):
 
 	update = False
 	if conf:
-		if conf[1]>upd_const:
+		if (time()-conf[1])/60>upd_time_min:
 			update = True
 
 	if not conf or update:
@@ -82,10 +82,9 @@ def get_configuration(connection, protocol_name, imei, d_model=None):
 				settings = loads(x['settings'])
 				model = x['model']
 
-		conf_cache[key] = [settings, 0]
+		conf_cache[key] = [settings, time()]
 	else:
-		settings, count = conf_cache[key]
-		conf_cache[key] = [settings, count+1]
+		settings, _ = conf_cache[key]
 
 	return settings
 

@@ -8,6 +8,7 @@ import datetime
 from time import time, sleep
 from json import load, loads, dumps
 
+from Beacon import BeaconParser
 from src.utils import *
 from src.db_worker import *
 from src.db_connect import CONN
@@ -86,6 +87,7 @@ class Teltonika:
 				packet = binascii.hexlify(self.sock.recv(4096))
 			except Exception:
 				self.sock.close()
+				self.db.close()
 				self.stop = True
 				logger.info(f'Teltonika{self.model} {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
 				break
@@ -99,6 +101,7 @@ class Teltonika:
 				else:
 					logger.error(f'[Teltonika] непонятный пакет: {packet}')
 					self.sock.close()
+					self.db.close()
 					self.stop = True
 					logger.info(f'[Teltonika{self.model}] {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
 					break
@@ -409,7 +412,8 @@ class Teltonika:
 		packet, length = extract_short(packet)
 		packet, beacon = extract(packet, length)
 
-		return packet, {"Beacon": beacon}
+		beacon_parsed = BeaconParser.parse(beacon)
+		return packet, {"BeaconData": beacon_parsed}
 
 
 	@staticmethod

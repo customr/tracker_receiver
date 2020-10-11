@@ -7,27 +7,26 @@ import threading
 from datetime import datetime
 from time import time, sleep
 from json import load, loads, dumps
+from enum import Enum
 
 from src.utils import *
 from src.db_worker import *
 from src.db_connect import CONN
 from src.logs.log_config import logger
 
+class BLOCK_TYPES(Enum):
+	s = 1
+	b = 2
+	i = 3
+	d = 4
+	l = 5
+	img = 6
 
 class Wialon:
 
 	BASE_PATH = 'tracker_receiver/src/protocols/Wialon/'
 	NAME = 'Wialon'
 	TRACKERS = set()
-
-	BLOCK_TYPES = {
-		1: 's',
-		2: 'b',
-		3: 'i',
-		4: 'd',
-		5: 'l',
-		6: 'img'
-	}
 
 	def __init__(self, sock, addr):
 		self.sock = sock
@@ -57,6 +56,7 @@ class Wialon:
 
 			except Exception:
 				self.sock.close()
+				self.db.close()
 				self.stop = True
 				self.success = False
 				Wialon.TRACKERS.remove(self)
@@ -70,6 +70,7 @@ class Wialon:
 				else:
 					logger.error(f'[Wialon] непонятный пакет: {packet}')
 					self.sock.close()
+					self.db.close()
 					self.stop = True
 					Wialon.TRACKERS.remove(self)
 					logger.debug(f'[Wialon {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
@@ -134,7 +135,7 @@ class Wialon:
 		packet, block_attribute = extract_ubyte(packet)
 		packet, block_type = extract_ubyte(packet)
 
-		block_type = Wialon.BLOCK_TYPES[block_type]
+		block_type = BLOCK_TYPES(block_type).name
 		name_length = packet.index(b'00')//2
 
 		packet, block_name = extract_str(packet, name_length)
