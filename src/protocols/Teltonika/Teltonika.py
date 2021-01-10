@@ -8,10 +8,8 @@ import datetime
 from time import time, sleep
 from json import load, loads, dumps
 
-from Beacon import BeaconParser
 from src.utils import *
 from src.db_worker import *
-from src.db_connect import CONN
 from src.logs.log_config import logger
 from src.protocols.Teltonika.crc import crc16
 
@@ -30,19 +28,18 @@ class Teltonika:
 
 	
 	def start(self):
-		Teltonika.TRACKERS.add(self)
-		self.db = pymysql.connect(**CONN)
-		
 		self.imei = self.handle_imei()
 		logger.info(f'Teltonika{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
+		Teltonika.TRACKERS.add(self)
 
-		self.assign = get_configuration(self.db, self.NAME, self.imei, self.model)
+		self.assign = get_configuration(self.NAME, self.imei, self.model)
 		self.decoder = self.get_decoder(self.model)
-		self.ign_v = get_ignition_v(self.db, self.imei)
+		self.ign_v = get_ignition_v(self.imei)
 		
 		self.lock = threading.Lock()
 		self.stop = False
-		self.handle_packet()
+		main_th = threading.Thread(target=self.handle_packet)
+		main_th.start()
 
 
 	def get_decoder(self, model):
@@ -67,29 +64,23 @@ class Teltonika:
 			logger.debug(f'[Teltonika] ответ на сообщение с imei отправлен\n')
 
 		except Exception as e:
-			try:
-				Teltonika.TRACKERS.remove(self)
-				self.stop = True
-				self.sock.close()
-				raise e
-			except Exception as e2:
-				return ''
+			self.sock.close()
+			Teltonika.TRACKERS.remove(self)
+			self.stop = True
+			raise e
 
 		return imei
 
 
 	def handle_packet(self):
-		if self.stop:
-			self.stop = False
-
 		while not self.stop:
 			try:
 				packet = binascii.hexlify(self.sock.recv(4096))
 			except Exception:
 				self.sock.close()
-				self.db.close()
 				self.stop = True
-				logger.info(f'Teltonika{self.model} {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
+				Teltonika.TRACKERS.remove(self)
+				logger.debug(f'[Teltonika{self.model}] {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
 				break
 
 			self.lock.acquire()
@@ -101,11 +92,12 @@ class Teltonika:
 				else:
 					logger.error(f'[Teltonika] непонятный пакет: {packet}')
 					self.sock.close()
-					self.db.close()
 					self.stop = True
-					logger.info(f'[Teltonika{self.model}] {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
+					Teltonika.TRACKERS.remove(self)
+					logger.debug(f'[Teltonika{self.model}] {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
 					break
 
+			logger.debug(f'[Teltonika] получен пакет:\n{packet}\n')
 			try:
 				packet, z = extract_int(packet) #preamble zero bytes
 				assert z==0, 'Not teltonika packet'
@@ -115,7 +107,6 @@ class Teltonika:
 				logger.debug(f'[Teltonika] codec={self.codec} rec_count={self.count}\n')
 
 			except Exception as e:
-				print('err')
 				with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
 					fd.write(f'Ошибка в распаковке {packet}\n{e}\n')
 			
@@ -123,9 +114,9 @@ class Teltonika:
 			if self.codec in (8, 142, 16):
 				self.data = self.handle_data(packet)
 				self.data = prepare_geo(self.data)
-				count = insert_geo(self.db, self.data)
+				count = insert_geo(self.data)
 				logger.info(f'Teltonika{self.model} {self.imei} принято {count}/{len(self.data)} записей')
-				self.sock.send(struct.pack("!I", len(self.data)))
+				self.sock.send(struct.pack("!I", count))
 
 			elif self.codec in (12, 13, 14):
 				result = self.handle_command(packet)
@@ -141,45 +132,47 @@ class Teltonika:
 			self.lock.release()
 			sleep(2)
 
+		del(self)
 
-		def send_command(self, codec, command):
-			result = ''
-			codec = int(codec)
-			if codec==12:
-				com_length = len(command)
-				length = 8+com_length
 
-			elif codec==14:
-				com_length = 8+len(command)
-				length = 8+com_length
+	def send_command(self, codec, command):
+		result = ''
+		codec = int(codec)
+		if codec==12:
+			com_length = len(command)
+			length = 8+com_length
 
-			elif codec==13:
-				result = 'Сервер не может отправлять команду по кодеку 13!'
-				return result
+		elif codec==14:
+			com_length = 8+len(command)
+			length = 8+com_length
 
-			else:
-				result = f'Неизвестный кодек - {codec}'
-				return result
+		elif codec==13:
+			result = 'Сервер не может отправлять команду по кодеку 13!'
+			return result
 
-			packet = ''
-			packet = add_int(packet, 0)
-			packet = add_uint(packet, length)
-			packet = add_ubyte(packet, codec)
-			packet = add_ubyte(packet, 1)
-			packet = add_ubyte(packet, 5)
-			packet = add_uint(packet, com_length)
+		else:
+			result = f'Неизвестный кодек - {codec}'
+			return result
 
-			if codec==14:
-				packet = add_str(packet, self.imei.rjust(16, '0'))
+		packet = ''
+		packet = add_int(packet, 0)
+		packet = add_uint(packet, length)
+		packet = add_ubyte(packet, codec)
+		packet = add_ubyte(packet, 1)
+		packet = add_ubyte(packet, 5)
+		packet = add_uint(packet, com_length)
 
-			packet = add_str(packet, command)
-			packet = add_ubyte(packet, 1)
-			crc16_pack = struct.unpack(f'{len(packet[16:])//2}s', binascii.a2b_hex(packet[16:].encode('ascii')))[0]
-			packet = add_uint(packet, crc16(crc16_pack))
-			logger.debug(f'[Teltonika] командный пакет сформирован:\n{packet}\n')
-			packet = pack(packet)
-			self.sock.send(packet)
-			logger.debug(f'[Teltonika] команда отправлена\n')
+		if codec==14:
+			packet = add_str(packet, self.imei.rjust(16, '0'))
+
+		packet = add_str(packet, command)
+		packet = add_ubyte(packet, 1)
+		crc16_pack = struct.unpack(f'{len(packet[16:])//2}s', binascii.a2b_hex(packet[16:].encode('ascii')))[0]
+		packet = add_uint(packet, crc16(crc16_pack))
+		logger.debug(f'[Teltonika] командный пакет сформирован:\n{packet}\n')
+		packet = pack(packet)
+		self.sock.send(packet)
+		logger.debug(f'[Teltonika] команда отправлена\n')
 
 
 	def handle_data(self, packet):
@@ -412,8 +405,7 @@ class Teltonika:
 		packet, length = extract_short(packet)
 		packet, beacon = extract(packet, length)
 
-		beacon_parsed = BeaconParser.parse(beacon)
-		return packet, {"BeaconData": beacon_parsed}
+		return packet, {"Beacon": beacon}
 
 
 	@staticmethod
