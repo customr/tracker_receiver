@@ -14,20 +14,21 @@ from src.db_worker import *
 from src.db_connect import CONN
 from src.logs.log_config import logger
 
-data_blocks = (
-    ADM.data_acc,
-    ADM.data_ain,
-    ADM.data_din,
-    ADM.data_fuel,
-    ADM.data_can,
-    ADM.data_odometr
-)
 
 class ADM:
 
     BASE_PATH = 'tracker_receiver/src/protocols/ADM/'
     NAME = 'ADM'
     TRACKERS = set()
+
+    DATA_BLOCKS = (
+        'data_acc',
+        'data_ain',
+        'data_din',
+        'data_fuel',
+        'data_can',
+        'data_odometr'
+    )
 
     def __init__(self, sock, addr, model):
         self.sock = sock
@@ -49,7 +50,15 @@ class ADM:
         self.lock = threading.Lock()
         self.stop = False
         self.data = {}
-        self.handle_packet()
+        try:
+            self.handle_packet()
+        except Exception as e:
+            ADM.TRACKERS.remove(self)
+            self.sock.close()
+            self.db.close()
+            self.stop = True
+            logger.info(f'{self.model} {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
+            raise e
 
 
     def handle_imei(self):
@@ -87,7 +96,8 @@ class ADM:
             try:
                 packet = binascii.hexlify(self.sock.recv(4))
                 packet = binascii.hexlify(self.sock.recv(extract_ushort(packet)[1]))
-            except Exception:
+            except Exception as e:
+                ADM.TRACKERS.remove(self)
                 self.sock.close()
                 self.db.close()
                 self.stop = True
@@ -106,8 +116,8 @@ class ADM:
                 for n, bit in enumerate(bits):
                     if bit:
                         before = packet[:]
-                        packet, d = data_blocks[n](self, packet)
-                        logger.debug(f'[ADM{self.model}] {self.imei} блок {data_blocks[n].__name__}\nПакет до: {before}\nПакет после: {packet}\nДанные: {d}')
+                        packet, d = getattr(ADM, ADM.DATA_BLOCKS[n])(self, packet)
+                        logger.debug(f'[ADM{self.model}] {self.imei} блок {ADM.DATA_BLOCKS[n]}\nПакет до: {before}\nПакет после: {packet}\nДанные: {d}')
                         data.update(d)
 
                 data = self.rename_data(data)
@@ -202,7 +212,7 @@ class ADM:
     def prepare_geo(self, data):
         ex_keys = ('lat', 'lon', 'speed', 'direction', 'dt', 'typ', 'pid')
         reserve = {k:v for k,v in data.items() if k not in ex_keys}
-        reserve = str(reserve).replace("'", '"').replace(' ', '')[1:-1]
+        reserve = str(reserve)[1:-1].replace("'", '"').replace(' ', '')
 
         geo = {
             'imei': self.imei,
@@ -224,4 +234,14 @@ class ADM:
 
 
     def rename_data(self, data):
+        for key, value in data.items():
+            if key in self.assign.keys():
+                ikey = self.assign[key]
+                if '*' in ikey:
+                    spl = ikey.split('*')
+                    ikey, k = spl[0], spl[1]
+                    new_val = round(value*float(k), 4)
+
+                data.update({ikey: new_val})
+
         return data
