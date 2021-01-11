@@ -9,11 +9,13 @@ from json import load, loads, dumps
 from src.server import TrackerServer
 from src.protocols.Teltonika import Teltonika
 from src.protocols.Wialon import Wialon
+from src.protocols.ADM import ADM
 from src.logs.log_config import logger
 
 protocols = {
 	'teltonika': Teltonika.Teltonika,
-	'wialon': Wialon.Wialon
+	'wialon': Wialon.Wialon,
+	'adm': ADM.ADM
 }
 
 
@@ -26,7 +28,7 @@ async def handler(ws, path):
 			except Exception as e:
 				logger.error(f'WEBSOCKET неизвестный пакет: {rec} {e}\n')
 				continue
-			
+
 			if rec['action']=='command':
 				tracker = Teltonika.Teltonika.get_tracker(rec['imei'])
 				if tracker is not None:

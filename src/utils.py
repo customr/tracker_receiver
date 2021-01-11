@@ -1,4 +1,4 @@
-import struct	
+import struct
 import binascii
 
 from src.logs.log_config import logger
@@ -38,7 +38,7 @@ def extract_ushort(packet, bdir='!'):
 
 def extract_int(packet, bdir='!'):
 	return extract_x(packet, f'{bdir}i', 4)
- 
+
 def extract_uint(packet, bdir='!'):
 	return extract_x(packet, f'{bdir}I', 4)
 
@@ -71,9 +71,9 @@ def add_x(packet, letter, value):
 	return packet
 
 def add_str(packet, string):
-	if not isinstance(string, bytes): 
+	if not isinstance(string, bytes):
 		string = string.encode('ascii')
-		
+
 	return add_x(packet, f'{len(string)}s', string)
 
 def add_byte(packet, value):
@@ -102,5 +102,3 @@ def add_float(packet, value):
 
 def add_double(packet, value):
 	return add_x(packet, 'd', value)
-
-

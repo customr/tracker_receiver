@@ -10,7 +10,8 @@ GEO_COLUMNS += '`ignition`,`sensor`,`reserve`, `ts`'
 
 PROTOCOLS = (
 	'teltonika',
-	'wialon'
+	'wialon',
+	'adm'
 	)
 
 PROTOCOLS_IDS = {k:v for k, v in zip(PROTOCOLS, range(1,len(PROTOCOLS)+1))}
@@ -50,7 +51,7 @@ def get_configuration(protocol_name, imei, d_model=None):
 					query = f"INSERT INTO `receiver_settings` VALUES ({pid}, {int(imei)}, '{model}', '{ins_settings}')"
 				else:
 					query = f"INSERT INTO `receiver_settings` VALUES ({pid}, {int(imei)}, NULL, '{ins_settings}')"
-				
+
 				cursor.execute(query)
 				connection.commit()
 
