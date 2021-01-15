@@ -48,6 +48,9 @@ def extract_long(packet, bdir='!'):
 def extract_longlong(packet, bdir='!'):
 	return extract_x(packet, f'{bdir}q', 8)
 
+def extract_ulonglong(packet, bdir='!'):
+	return extract_x(packet, f'{bdir}Q', 8)
+
 def extract_float(packet, bdir='!'):
 	packet, extracted = extract_x(packet, f'{bdir}f', 4)
 	return packet, round(extracted, 3)

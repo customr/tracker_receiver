@@ -26,7 +26,7 @@ class Teltonika:
 		self.model = model
 		self.command_response = {}
 
-	
+
 	def start(self):
 		self.imei = self.handle_imei()
 		logger.info(f'Teltonika{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
@@ -35,7 +35,7 @@ class Teltonika:
 		self.assign = get_configuration(self.NAME, self.imei, self.model)
 		self.decoder = self.get_decoder(self.model)
 		self.ign_v = get_ignition_v(self.imei)
-		
+
 		self.lock = threading.Lock()
 		self.stop = False
 		main_th = threading.Thread(target=self.handle_packet)
@@ -109,7 +109,7 @@ class Teltonika:
 			except Exception as e:
 				with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
 					fd.write(f'Ошибка в распаковке {packet}\n{e}\n')
-			
+
 
 			if self.codec in (8, 142, 16):
 				self.data = self.handle_data(packet)
@@ -318,7 +318,7 @@ class Teltonika:
 
 				elif self.codec==142 or self.codec==16:
 					packet, io_id = extract_ushort(packet)
-					
+
 				else:
 					logger.critical(f"Teltonika неизвестный кодек {self.codec}\n")
 					raise ValueError('Unknown codec')
@@ -351,7 +351,7 @@ class Teltonika:
 						iodata.update({self.decoder[str(io_id)]: io_val})
 
 			data.update(iodata)
-		
+
 
 		if self.codec==142:
 			packet, count = extract_ushort(packet)

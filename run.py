@@ -30,10 +30,20 @@ async def handler(ws, path):
 				continue
 
 			if rec['action']=='command':
-				tracker = Teltonika.Teltonika.get_tracker(rec['imei'])
-				if tracker is not None:
+				teltonika = Teltonika.Teltonika.get_tracker(rec['imei'])
+				adm = ADM.ADM.get_tracker(rec['imei'])
+				if adm or teltonika:
+					if teltonika:
+						tracker = teltonika
+					else:
+						tracker = adm
+
 					logger.debug(f"WEBSOCKET tracker {rec['imei']} found\n")
-					Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
+					if teltonika:
+						Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
+					elif adm:
+						ADM.ADM.send_command(tracker, rec['command'])
+
 					logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent\n")
 
 					for _ in range(10):
@@ -49,6 +59,8 @@ async def handler(ws, path):
 							logger.error(f"WEBSOCKET ошибка при отправке ответа {e}\n")
 
 						tracker.command_response = {}
+					else:
+						await ws.send(dumps({"action":"response", "result": "Время ожидания ответа истекло"}))
 
 				else:
 					await ws.send(dumps({"action":"response", "result": "Трекер не подключен"}))
