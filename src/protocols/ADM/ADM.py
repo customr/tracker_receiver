@@ -34,15 +34,19 @@ class ADM:
         self.sock = sock
         self.addr = addr
         self.model = model
-        self.need_reply = False
 
 
     def start(self):
         ADM.TRACKERS.add(self)
         self.db = pymysql.connect(**CONN)
 
+        self.need_reply = 0
         self.imei = self.handle_imei()
         logger.info(f'ADM{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
+
+        if not self.imei.isdigit():
+            self.close()
+            return
 
         self.assign = get_configuration(self.NAME, self.imei, self.model)
         self.ign_v = get_ignition_v(self.imei)
@@ -51,26 +55,31 @@ class ADM:
         self.stop = False
         self.data = {}
         self.command_response = {}
+
         try:
             self.handle_packet()
         except Exception as e:
-            ADM.TRACKERS.remove(self)
-            self.sock.close()
-            self.db.close()
-            self.stop = True
-            logger.info(f'ADM{self.model} {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
             raise e
+
+
+    def close(self):
+        ADM.TRACKERS.remove(self)
+        self.sock.close()
+        self.db.close()
+        self.stop = True
+        logger.info(f'ADM{self.model} {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
 
 
     def handle_imei(self):
         try:
-            packet = binascii.hexlify(self.sock.recv(64))
-            packet, _ = extract_ushort(packet)
-            packet, _ = extract_ubyte(packet)
-            packet, _ = extract_ubyte(packet)
+            packet = binascii.hexlify(self.sock.recv(1024))
+            logger.debug(f'[ADM{self.model}] пакет с imei: {packet}')
+            packet, _ = extract_ushort(packet, '=')
+            packet, _ = extract_ubyte(packet, '=')
+            packet, _ = extract_ubyte(packet, '=')
             packet, imei = extract_str(packet, 15)
-            packet, _ = extract_ubyte(packet)
-            packet, need_reply = extract_ubyte(packet)
+            packet, _ = extract_ubyte(packet, '=')
+            packet, need_reply = extract_ubyte(packet, '=')
 
             self.need_reply = need_reply
             logger.debug(f'[ADM{self.model}] imei получен {imei}\nneed reply={need_reply}\n')
@@ -78,11 +87,7 @@ class ADM:
             # logger.debug(f'[ADM] ответ на сообщение с imei отправлен\n')
 
         except Exception as e:
-            ADM.TRACKERS.remove(self)
-            self.stop = True
-            self.sock.close()
-            self.db.close()
-            logger.info(f'ADM{self.model} {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
+            self.close()
             raise e
 
         return imei.decode('ascii')
@@ -101,13 +106,16 @@ class ADM:
 
                 if len(packet)==0x84:
                     try:
+                        self.lock.acquire()
+                        logger.debug(f'[ADM{self.model}] {self.imei} принят ответ на команду {packet}')
                         result = self.handle_command(packet)
+                        self.lock.release()
                     except Exception as e:
                         result = "Ошибка на сервере: "+str(e)
 
                         resp = {"action":"response", "result": result}
                         self.command_response = dumps(resp)
-                        logger.debug(f'[ADM{self.model}] {self.imei} ответ на команду принят\n{result}\n')
+                        logger.debug(f'[ADM{self.model}] {self.imei} ошибка распаковки ответа на команду\n{result}\n')
                         logger.info(str(e))
                         continue
 
@@ -117,11 +125,7 @@ class ADM:
                     continue
 
             except Exception as e:
-                ADM.TRACKERS.remove(self)
-                self.sock.close()
-                self.db.close()
-                self.stop = True
-                logger.info(f'ADM{self.model} {self.imei} отключен [{self.addr[0]}:{self.addr[1]}]')
+                self.close()
                 break
 
             self.lock.acquire()
@@ -186,7 +190,7 @@ class ADM:
         packet, _ = extract_ubyte(packet, '=')
         packet, typ = extract_ubyte(packet, '=')
         packet, _ = extract_ubyte(packet, '=')
-        packet, pid = extract_ushort(packet, '=')
+        packet, ID = extract_ushort(packet, '=')
         packet, status = extract_ushort(packet, '=')
         packet, lat = extract_float(packet, '<')
         packet, lon = extract_float(packet, '<')
@@ -221,7 +225,10 @@ class ADM:
         packet, OUT = extract_ubyte(packet, '=')
         packet, IN_ALARM = extract_ubyte(packet, '=')
 
-        data = {key:value for key, value in locals().items() if key not in ['self', 'packet']}
+        data = {key:value for key, value in locals().items() if key not in ['self', 'packet', 'IN_ALARM']}
+        for i in range(4):
+            data[f'IN_ALARM_{i}'] = (IN_ALARM & i) > 0
+
         return packet, data
 
 
@@ -268,13 +275,13 @@ class ADM:
             tag = can&0x3f
             data_len = (can&0xc0)>>6
             if data_len==0:
-                can_packet, value = extract_ubyte(can_packet, '<')
+                can_packet, value = extract_byte(can_packet, '<')
             elif data_len==1:
-                can_packet, value = extract_ushort(can_packet, '<')
+                can_packet, value = extract_short(can_packet, '<')
             elif data_len==2:
-                can_packet, value = extract_uint(can_packet, '<')
+                can_packet, value = extract_int(can_packet, '<')
             elif data_len==3:
-                can_packet, value = extract_ulonglong(can_packet, '<')
+                can_packet, value = extract_longlong(can_packet, '<')
             else:
                 value = 'error'
 
@@ -291,7 +298,7 @@ class ADM:
 
 
     def prepare_geo(self, data):
-        ex_keys = ('lat', 'lon', 'speed', 'direction', 'timestamp', 'dt', 'typ', 'pid', '_')
+        ex_keys = ('lat', 'lon', 'speed', 'direction', 'timestamp', 'dt', 'typ', '_')
         reserve = {k:v for k,v in data.items() if k not in ex_keys}
         reserve = str(reserve)[1:-1].replace("'", '"').replace(' ', '')
 

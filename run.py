@@ -38,13 +38,13 @@ async def handler(ws, path):
 					else:
 						tracker = adm
 
-					logger.debug(f"WEBSOCKET tracker {rec['imei']} found\n")
+					logger.debug(f"WEBSOCKET tracker {rec['imei']} found")
 					if teltonika:
 						Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
 					elif adm:
 						ADM.ADM.send_command(tracker, rec['command'])
 
-					logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent\n")
+					logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent")
 
 					for _ in range(10):
 						sleep(2)
@@ -52,11 +52,11 @@ async def handler(ws, path):
 							break
 
 					if tracker.command_response!={}:
-						logger.debug(f'WEBSOCKET command response\n{tracker.command_response}\n')
+						logger.debug(f'WEBSOCKET command response\n{tracker.command_response}')
 						try:
 							await ws.send(tracker.command_response)
 						except Exception as e:
-							logger.error(f"WEBSOCKET ошибка при отправке ответа {e}\n")
+							logger.error(f"WEBSOCKET ошибка при отправке ответа {e}")
 
 						tracker.command_response = {}
 					else:
@@ -64,7 +64,7 @@ async def handler(ws, path):
 
 				else:
 					await ws.send(dumps({"action":"response", "result": "Трекер не подключен"}))
-					logger.info(f"WEBSOCKET {rec['imei']} не подключен\n")
+					logger.info(f"WEBSOCKET {rec['imei']} не подключен")
 					continue
 
 			else:
