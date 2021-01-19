@@ -16,7 +16,7 @@ class TrackerServer:
 
 		if self.ip=='': self.ip = 'ANY'
 		logger.info(f'Сервер для {protocol.NAME}{model} запущен - [{self.ip}:{self.port}]\n')
-		
+
 		listen_th = threading.Thread(target=self.connecter, args=(protocol, model))
 		listen_th.start()
 
@@ -24,6 +24,6 @@ class TrackerServer:
 	def connecter(self, protocol, model):
 		while True:
 			conn, addr = self.sock.accept()
-			conn.settimeout(60)
+			conn.settimeout(600)
 			new = protocol(conn, addr, model)
 			threading.Thread(target=protocol.start, args=(new, )).start()

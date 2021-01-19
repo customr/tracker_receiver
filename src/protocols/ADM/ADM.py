@@ -42,24 +42,22 @@ class ADM:
 
         self.need_reply = 0
         self.imei = self.handle_imei()
-        logger.info(f'ADM{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
 
-        if not self.imei.isdigit():
-            self.close()
-            return
+        if not self.imei is None:
+            logger.info(f'ADM{self.model} {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
 
-        self.assign = get_configuration(self.NAME, self.imei, self.model)
-        self.ign_v = get_ignition_v(self.imei)
+            self.assign = get_configuration(self.NAME, self.imei, self.model)
+            self.ign_v = get_ignition_v(self.imei)
 
-        self.lock = threading.Lock()
-        self.stop = False
-        self.data = {}
-        self.command_response = {}
+            self.stop = False
+            self.data = {}
+            self.command_response = {}
 
-        try:
-            self.handle_packet()
-        except Exception as e:
-            raise e
+            try:
+                self.handle_packet()
+            except Exception as e:
+                self.close()
+                raise e
 
 
     def close(self):
@@ -78,6 +76,14 @@ class ADM:
             packet, _ = extract_ubyte(packet, '=')
             packet, _ = extract_ubyte(packet, '=')
             packet, imei = extract_str(packet, 15)
+
+            if not imei.isdigit():
+                ADM.TRACKERS.remove(self)
+                self.sock.close()
+                self.db.close()
+                self.stop = True
+                return None
+
             packet, _ = extract_ubyte(packet, '=')
             packet, need_reply = extract_ubyte(packet, '=')
 
@@ -104,36 +110,17 @@ class ADM:
                 if len(packet)==4:
                     packet = binascii.hexlify(self.sock.recv(1024))
 
-                if len(packet)==0x84:
-                    try:
-                        self.lock.acquire()
-                        logger.debug(f'[ADM{self.model}] {self.imei} принят ответ на команду {packet}')
-                        result = self.handle_command(packet)
-                        self.lock.release()
-                    except Exception as e:
-                        result = "Ошибка на сервере: "+str(e)
-
-                        resp = {"action":"response", "result": result}
-                        self.command_response = dumps(resp)
-                        logger.debug(f'[ADM{self.model}] {self.imei} ошибка распаковки ответа на команду\n{result}\n')
-                        logger.info(str(e))
-                        continue
-
-                    resp = {"action":"response", "result": result}
-                    self.command_response = dumps(resp)
-                    logger.debug(f'[ADM{self.model}] {self.imei} ответ на команду принят\n{result}\n')
-                    continue
-
             except Exception as e:
                 self.close()
                 break
 
-            self.lock.acquire()
             logger.debug(f'[ADM{self.model}] {self.imei} принят пакет {packet}')
 
             all_data = []
             while len(packet)>0:
                 packet, data = self.data_main(packet)
+                if packet is None:
+                    break
                 logger.debug(f'[ADM{self.model}] {self.imei} основные данные обработаны\n{data}')
                 logger.debug(f'[ADM{self.model}] {self.imei} статус пакета {data["typ"]}')
                 bits = list(map(int, str(bin(data['typ']))[2:][::-1]))[2:]
@@ -150,15 +137,16 @@ class ADM:
                 logger.debug(f'[ADM{self.model}] {self.imei} данные после обработки: {data}')
                 all_data.append(data)
 
-            count = insert_geo(all_data)
-            logger.info(f'ADM{self.model} {self.imei} принято {count}/{len(all_data)} записей')
-            if self.need_reply==1:
-                pass
-            elif self.need_reply==2:
-                self.sock.send(b'***'+str(count).encode('ascii')+b'*')
+            if not packet is None:
+                count = insert_geo(all_data)
+                logger.info(f'ADM{self.model} {self.imei} принято {count}/{len(all_data)} записей')
+                if self.need_reply==1:
+                    pass
+                elif self.need_reply==2:
+                    self.sock.send(b'***'+str(count).encode('ascii')+b'*')
 
 
-    def send_command(self, codec, command):
+    def send_command(self, command):
         packet = ''
         packet = add_str(packet, command)
         packet = add_byte(packet, 0x0D)
@@ -172,7 +160,7 @@ class ADM:
     def handle_command(self, packet):
         packet, _ = extract_ushort(packet, '=')
         packet, _ = extract_ubyte(packet, '=')
-        packet, resp = extract_str(packet, 129, '=')
+        resp = str(binascii.a2b_hex(packet))[2:-1]
         return resp
 
 
@@ -187,7 +175,27 @@ class ADM:
 
     def data_main(self, packet):
         packet, _ = extract_ushort(packet, '=')
-        packet, _ = extract_ubyte(packet, '=')
+        packet, size = extract_ubyte(packet, '=')
+
+        if size==0x84:
+            try:
+                logger.debug(f'[ADM{self.model}] {self.imei} принят ответ на команду {packet}')
+                result = self.handle_command(packet)
+                logger.info(f'[ADM{self.model}] {self.imei} {self.command_response}')
+            except Exception as e:
+                result = "Ошибка на сервере: "+str(e)
+
+                resp = {"action":"response", "result": result}
+                self.command_response = dumps(resp)
+                logger.debug(f'[ADM{self.model}] {self.imei} ошибка распаковки ответа на команду\n{result}\n')
+                logger.info(str(e))
+            else:
+                resp = {"action":"response", "result": result}
+                self.command_response = dumps(resp)
+                logger.debug(f'[ADM{self.model}] {self.imei} ответ на команду принят\n{result}\n')
+
+            return None, None
+
         packet, typ = extract_ubyte(packet, '=')
         packet, _ = extract_ubyte(packet, '=')
         packet, ID = extract_ushort(packet, '=')
@@ -227,7 +235,7 @@ class ADM:
 
         data = {key:value for key, value in locals().items() if key not in ['self', 'packet', 'IN_ALARM']}
         for i in range(4):
-            data[f'IN_ALARM_{i}'] = (IN_ALARM & i) > 0
+            data[f'IN_ALARM_{i}'] = int((IN_ALARM & (2**i)) > 0)
 
         return packet, data
 
@@ -298,14 +306,14 @@ class ADM:
 
 
     def prepare_geo(self, data):
-        ex_keys = ('lat', 'lon', 'speed', 'direction', 'timestamp', 'dt', 'typ', '_')
+        ex_keys = ('lat', 'lon', 'speed', 'direction', 'timestamp', 'dt', 'typ', 'size', 'ID', '_')
         reserve = {k:v for k,v in data.items() if k not in ex_keys}
         reserve = str(reserve)[1:-1].replace("'", '"').replace(' ', '')
 
         geo = {
             'imei': self.imei,
-            'lat': float('{:.3f}'.format(data['lat'])),
-            'lon': float('{:.3f}'.format(data['lon'])),
+            'lat': float('{:.6f}'.format(data['lat'])),
+            'lon': float('{:.6f}'.format(data['lon'])),
             'datetime': data['dt'],
             'type': 0,
             'speed': data['speed'],
@@ -322,14 +330,24 @@ class ADM:
 
 
     def rename_data(self, data):
+        new_data = {}
         for key, value in data.items():
             if key in self.assign.keys():
                 ikey = self.assign[key]
                 if '*' in ikey:
                     spl = ikey.split('*')
                     ikey, k = spl[0], spl[1]
-                    new_val = round(value*float(k), 4)
+                    new_val = round(value*float(k), 2)
 
-                data.update({ikey: new_val})
+                    if ikey=='temp' or ikey=='temp2':
+                        new_val = round(new_val, 1)
 
-        return data
+                    new_data[ikey] = new_val
+                    continue
+
+                new_data[ikey] = value
+                continue
+
+            new_data[key] = value
+
+        return new_data

@@ -53,11 +53,11 @@ def extract_ulonglong(packet, bdir='!'):
 
 def extract_float(packet, bdir='!'):
 	packet, extracted = extract_x(packet, f'{bdir}f', 4)
-	return packet, round(extracted, 3)
+	return packet, round(extracted, 6)
 
 def extract_double(packet, bdir='!'):
 	packet, extracted = extract_x(packet, f'{bdir}d', 8)
-	return packet, round(extracted, 3)
+	return packet, round(extracted, 6)
 
 def unpack_from_bytes(fmt, packet):
 	packet = binascii.a2b_hex(packet)
