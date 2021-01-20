@@ -109,6 +109,8 @@ class ADM:
                 packet = binascii.hexlify(self.sock.recv(1024))
                 if len(packet)==4:
                     packet = binascii.hexlify(self.sock.recv(1024))
+                if len(packet)==0:
+                    continue
 
             except Exception as e:
                 self.close()
