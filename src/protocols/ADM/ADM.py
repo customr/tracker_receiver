@@ -34,6 +34,7 @@ class ADM:
         self.sock = sock
         self.addr = addr
         self.model = model
+        self.imei = ''
 
 
     def start(self):
@@ -160,8 +161,6 @@ class ADM:
 
 
     def handle_command(self, packet):
-        packet, _ = extract_ushort(packet, '=')
-        packet, _ = extract_ubyte(packet, '=')
         resp = str(binascii.a2b_hex(packet))[2:-1]
         return resp
 
