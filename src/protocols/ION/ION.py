@@ -31,9 +31,6 @@ class ION:
         ION.TRACKERS.add(self)
         self.db = pymysql.connect(**CONN)
 
-        self.assign = get_configuration(self.NAME, self.imei)
-        self.ign_v = get_ignition_v(self.imei)
-
         self.stop = False
         self.data = {}
         self.command_response = {}
@@ -66,9 +63,18 @@ class ION:
 
             packet, packet_type = extract_ubyte(packet)
             packet, packets = extract_ubyte(packet)
+
+            if not self.imei:
+                first_time = True
+            else:
+                first_time = False
+
             packet, self.imei = ION.parse_imei(packet)
 
-            logger.info(f'ION {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
+            if first_time:
+                logger.info(f'ION {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
+                self.assign = get_configuration(self.NAME, self.imei)
+                self.ign_v = get_ignition_v(self.imei)
 
             all_data = {}
             for i in range(packets):

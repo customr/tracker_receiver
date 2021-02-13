@@ -10,12 +10,14 @@ from src.server import TrackerServer
 from src.protocols.Teltonika import Teltonika
 from src.protocols.Wialon import Wialon
 from src.protocols.ADM import ADM
+from src.protocols.ION import ION
 from src.logs.log_config import logger
 
 protocols = {
 	'teltonika': Teltonika.Teltonika,
 	'wialon': Wialon.Wialon,
-	'adm': ADM.ADM
+	'adm': ADM.ADM,
+	'ion': ION.ION,
 }
 
 

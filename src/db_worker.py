@@ -11,7 +11,8 @@ GEO_COLUMNS += '`ignition`,`sensor`,`reserve`, `ts`'
 PROTOCOLS = (
 	'teltonika',
 	'wialon',
-	'adm'
+	'adm',
+	'ion'
 	)
 
 PROTOCOLS_IDS = {k:v for k, v in zip(PROTOCOLS, range(1,len(PROTOCOLS)+1))}
