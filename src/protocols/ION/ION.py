@@ -61,6 +61,10 @@ class ION:
                 self.close()
                 break
 
+            if len(packet)==0:
+                continue
+
+            logger.debug(f'[ION] {self.imei} получен пакет {packet}')
             packet, packet_type = extract_ubyte(packet)
             packet, packets = extract_ubyte(packet)
 
@@ -83,10 +87,10 @@ class ION:
                     logger.debug(f'[ION] {self.imei} данные #{i} {data}')
                     data = self.rename_data(data)
                     logger.debug(f'[ION] {self.imei} данные после переименования: {data}')
-                    data = ION.prepare_geo(data)
+                    data = self.prepare_geo(data)
                     logger.debug(f'[ION] {self.imei} данные после обработки: {data}')
                 except Exception as e:
-                    logger.error(f'[ION] {self.imei} ошибка парсинга\n{e}\nПакет{packet}')
+                    logger.error(f'[ION] {self.imei} ошибка парсинга\n{str(e)}\nПакет{packet}')
                 else:
                     all_data.append(data)
 
@@ -99,20 +103,21 @@ class ION:
     @staticmethod
     def parse_imei(packet):
         packet, imei = extract_str(packet, 7)
-        part_1 = int(f'0x{imei[:3]}', 16)
-        part_2 = int(f'0x{imei[3:]}', 16)
+        imei = binascii.hexlify(imei).decode()
+        part_1 = int(f'0x{imei[:6]}', 16)
+        part_2 = int(f'0x{imei[6:]}', 16)
         imei = f'{part_1}{part_2}'
         return packet, imei
 
 
     @staticmethod
     def parse_data(packet):
-        packet, lan = extract_int(packet)/100000
-        packet, lon = extract_int(packet)/100000
-        packet, speed = extract_ubyte(packet)*1.852
-        packet, direction = extract_ubyte(packet)*2
+        packet, lat = extract_int(packet)
+        packet, lon = extract_int(packet)
+        packet, speed = extract_ubyte(packet)
+        packet, direction = extract_ubyte(packet)
         packet, sat_num = extract_ubyte(packet)
-        packet, HDOP = extract_ubyte(packet)/10
+        packet, HDOP = extract_ubyte(packet)
         packet, status = extract_ubyte(packet)
 
         packet, AIN = extract_ushort(packet)
@@ -126,24 +131,29 @@ class ION:
         packet, minute = extract_ubyte(packet)
         packet, second = extract_ubyte(packet)
 
-        packet, dt = datetime.datetime(
+        dt = datetime.datetime(
             day=day, month=month, year=year,
             hour=hour, minute=minute, second=second
             )
 
+        lan = lan/100000
+        lon = lon/100000
+        speed = speed*1.852
+        direction = direction*2
+        HDOP = HDOP/10
+
         exclude = ['packet','status','day','month','year','hour','minute','second']
-        data = {key:value for key, value in locals().items() if key not in exclude or key!='exclude'}
+        data = {key:value for key, value in locals().items() if key not in exclude and key!='exclude'}
         return packet, data
 
 
-    @staticmethod
-    def prepare_geo(data):
+    def prepare_geo(self, data):
         ex_keys = ('lat', 'lon', 'speed', 'direction', 'dt')
         reserve = {k:v for k,v in data.items() if k not in ex_keys}
         reserve = str(reserve)[1:-1].replace("'", '"').replace(' ', '')
 
         geo = {
-            'imei': data['imei'],
+            'imei': self.imei,
             'lat': float('{:.6f}'.format(data['lat'])),
             'lon': float('{:.6f}'.format(data['lon'])),
             'datetime': data['dt'],
