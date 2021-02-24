@@ -69,6 +69,10 @@ class ION:
             packets = None
             if packet_type==0xe7 or packet_type==0x83:
                 packet, packets = extract_ubyte(packet)
+            elif packet_type==0xf0 or packet_type==0xf1:
+                result = self.handle_command(packet, packet_type)
+                resp = {"action":"response", "result": result}
+                self.command_response = dumps(resp)
 
             if not self.imei:
                 first_time = True
@@ -213,3 +217,36 @@ class ION:
             new_data[key] = value
 
         return new_data
+
+
+    def send_command(self, command):
+        packet = ''
+        packet = add_ubyte(packet, 0xf0)
+        packet = add_ubyte(packet, 0x01)
+        packet = add_str(packet, command)
+        logger.debug(f'[ION] {self.imei} командный пакет сформирован:\n{packet}\n')
+        packet = pack(packet)
+        self.sock.send(packet)
+        logger.debug(f'[ION] {self.imei} команда {command} отправлена\n')
+
+
+    def handle_command(self, packet, typ):
+        if typ == 0xf0:
+            packet, size = extract_ubyte(packet)
+        else:
+            packet, size = extract_ushort(packet)
+
+        packet, imei = ION.parse_imei(packet)
+        packet, _ = extract_byte(packet)
+        packet, msg = extract_str(packet, size)
+
+        return msg
+
+
+    @staticmethod
+    def get_tracker(imei):
+        for t in ION.TRACKERS:
+            if str(t.imei)==str(imei):
+                return t
+
+        return None

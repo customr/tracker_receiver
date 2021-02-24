@@ -34,17 +34,22 @@ async def handler(ws, path):
 			if rec['action']=='command':
 				teltonika = Teltonika.Teltonika.get_tracker(rec['imei'])
 				adm = ADM.ADM.get_tracker(rec['imei'])
-				if adm or teltonika:
+				ion = ION.ION.get_tracker(rec['imei'])
+				if any([teltonika, adm, ion]):
 					if teltonika:
 						tracker = teltonika
-					else:
+					elif adm:
 						tracker = adm
+					elif ion:
+						tracker = ion
 
 					logger.debug(f"WEBSOCKET tracker {rec['imei']} found")
 					if teltonika:
 						Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
 					elif adm:
 						ADM.ADM.send_command(tracker, rec['command'])
+					elif ion:
+						ION.ION.send_command(tracker, rec['command'])
 
 					logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent")
 

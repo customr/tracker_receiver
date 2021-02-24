@@ -182,7 +182,6 @@ class ADM:
             try:
                 logger.debug(f'[ADM{self.model}] {self.imei} принят ответ на команду {packet}')
                 result = self.handle_command(packet)
-                logger.info(f'[ADM{self.model}] {self.imei} {self.command_response}')
             except Exception as e:
                 result = "Ошибка на сервере: "+str(e)
 
