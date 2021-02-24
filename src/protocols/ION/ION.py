@@ -56,17 +56,19 @@ class ION:
 
         while not self.stop:
             try:
-                packet = binascii.hexlify(self.sock.recv(1024))
+                packet = binascii.hexlify(self.sock.recv(4096))
             except Exception as e:
-                self.close()
-                break
+                raise e
 
             if len(packet)==0:
                 continue
-
-            logger.debug(f'[ION] {self.imei} получен пакет {packet}')
+            
+            logger.debug(f'[ION] получен пакет {packet}')
             packet, packet_type = extract_ubyte(packet)
-            packet, packets = extract_ubyte(packet)
+            
+            packets = None
+            if packet_type==0xe7 or packet_type==0x83:
+                packet, packets = extract_ubyte(packet)
 
             if not self.imei:
                 first_time = True
@@ -79,20 +81,35 @@ class ION:
                 logger.info(f'ION {self.imei} подключен [{self.addr[0]}:{self.addr[1]}]')
                 self.assign = get_configuration(self.NAME, self.imei)
                 self.ign_v = get_ignition_v(self.imei)
-
-            all_data = {}
-            for i in range(packets):
-                try:
-                    packet, data = ION.parse_data(packet)
-                    logger.debug(f'[ION] {self.imei} данные #{i} {data}')
-                    data = self.rename_data(data)
-                    logger.debug(f'[ION] {self.imei} данные после переименования: {data}')
-                    data = self.prepare_geo(data)
-                    logger.debug(f'[ION] {self.imei} данные после обработки: {data}')
-                except Exception as e:
-                    logger.error(f'[ION] {self.imei} ошибка парсинга\n{str(e)}\nПакет{packet}')
-                else:
-                    all_data.append(data)
+            
+            logger.debug(f'[ION] {self.imei} всего записей: {packets}')
+            all_data = []
+            if packets:
+                for i in range(packets):
+                    try:
+                        packet, data = ION.parse_data(packet)
+                        logger.debug(f'[ION] {self.imei} данные #{i} {data}')
+                        data = self.rename_data(data)
+                        logger.debug(f'[ION] {self.imei} данные после переименования: {data}')
+                        data = self.prepare_geo(data)
+                        logger.debug(f'[ION] {self.imei} данные после обработки: {data}')
+                        all_data.append(data)
+                    except Exception as e:
+                        logger.error(f'[ION] {self.imei} ошибка парсинга\n{str(e)}\nПакет {packet}')
+                        break
+            else:
+                while len(packet)>0:
+                    try:
+                        packet, data = ION.parse_data(packet)
+                        logger.debug(f'[ION] {self.imei} данные #{i} {data}')
+                        data = self.rename_data(data)
+                        logger.debug(f'[ION] {self.imei} данные после переименования: {data}')
+                        data = self.prepare_geo(data)
+                        logger.debug(f'[ION] {self.imei} данные после обработки: {data}')
+                        all_data.append(data)
+                    except Exception as e:
+                        logger.error(f'[ION] {self.imei} ошибка парсинга\n{str(e)}\nПакет {packet}')
+                        break
 
             count = insert_geo(all_data)
             logger.info(f'ION {self.imei} принято {count}/{packets} записей')
@@ -130,14 +147,17 @@ class ION:
         packet, hour = extract_ubyte(packet)
         packet, minute = extract_ubyte(packet)
         packet, second = extract_ubyte(packet)
-
+        
+        year = int(f'20{year}')
         dt = datetime.datetime(
             day=day, month=month, year=year,
             hour=hour, minute=minute, second=second
             )
 
-        lan = lan/100000
+        lat = lat/100000
         lon = lon/100000
+        lat = lat//100+(lat%100)/60
+        lon = lon//100+(lon%100)/60
         speed = speed*1.852
         direction = direction*2
         HDOP = HDOP/10
