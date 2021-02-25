@@ -165,6 +165,7 @@ class ION:
         speed = speed*1.852
         direction = direction*2
         HDOP = HDOP/10
+        VOLTAGE = VOLTAGE/1000
 
         exclude = ['packet','status','day','month','year','hour','minute','second']
         data = {key:value for key, value in locals().items() if key not in exclude and key!='exclude'}
