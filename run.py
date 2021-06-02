@@ -1,4 +1,4 @@
-import os
+﻿import os
 import threading
 import websockets
 import asyncio
@@ -10,12 +10,16 @@ from src.server import TrackerServer
 from src.protocols.Teltonika import Teltonika
 from src.protocols.Wialon import Wialon
 from src.protocols.ADM import ADM
+from src.protocols.ION import ION
+from src.protocols.WialonCombine import WialonCombine
 from src.logs.log_config import logger
 
 protocols = {
 	'teltonika': Teltonika.Teltonika,
 	'wialon': Wialon.Wialon,
-	'adm': ADM.ADM
+	'adm': ADM.ADM,
+	'ion': ION.ION,
+	'wialoncombine': WialonCombine.WialonCombine
 }
 
 
@@ -32,17 +36,27 @@ async def handler(ws, path):
 			if rec['action']=='command':
 				teltonika = Teltonika.Teltonika.get_tracker(rec['imei'])
 				adm = ADM.ADM.get_tracker(rec['imei'])
-				if adm or teltonika:
+				ion = ION.ION.get_tracker(rec['imei'])
+				wialoncombine = WialonCombine.WialonCombine.get_tracker(rec['imei'])
+				if any([teltonika, adm, ion, wialoncombine]):
 					if teltonika:
 						tracker = teltonika
-					else:
+					elif adm:
 						tracker = adm
+					elif ion:
+						tracker = ion
+					elif wialoncombine:
+						tracker = WialonCombine
 
 					logger.debug(f"WEBSOCKET tracker {rec['imei']} found")
 					if teltonika:
 						Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
 					elif adm:
 						ADM.ADM.send_command(tracker, rec['command'])
+					elif ion:
+						ION.ION.send_command(tracker, rec['command'])
+					elif wialoncombine:
+						WialonCombine.WialonCombine.send_command(tracker, rec['command'])
 
 					logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent")
 
@@ -71,8 +85,7 @@ async def handler(ws, path):
 				continue
 
 		except Exception as e:
-			logger.info(e)
-			break
+			raise e
 
 
 

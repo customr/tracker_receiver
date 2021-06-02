@@ -34,6 +34,7 @@ class ADM:
         self.sock = sock
         self.addr = addr
         self.model = model
+        self.imei = ''
 
 
     def start(self):
@@ -160,8 +161,6 @@ class ADM:
 
 
     def handle_command(self, packet):
-        packet, _ = extract_ushort(packet, '=')
-        packet, _ = extract_ubyte(packet, '=')
         resp = str(binascii.a2b_hex(packet))[2:-1]
         return resp
 
@@ -169,6 +168,8 @@ class ADM:
     @staticmethod
     def get_tracker(imei):
         for t in ADM.TRACKERS:
+            if not hasattr(t, 'imei'):
+                continue
             if str(t.imei)==str(imei):
                 return t
 
@@ -183,7 +184,6 @@ class ADM:
             try:
                 logger.debug(f'[ADM{self.model}] {self.imei} принят ответ на команду {packet}')
                 result = self.handle_command(packet)
-                logger.info(f'[ADM{self.model}] {self.imei} {self.command_response}')
             except Exception as e:
                 result = "Ошибка на сервере: "+str(e)
 

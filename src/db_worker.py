@@ -1,4 +1,4 @@
-import pymysql
+﻿import pymysql
 
 from json import loads, load
 from contextlib import closing
@@ -11,7 +11,9 @@ GEO_COLUMNS += '`ignition`,`sensor`,`reserve`, `ts`'
 PROTOCOLS = (
 	'teltonika',
 	'wialon',
-	'adm'
+	'adm',
+	'ion',
+    'wialoncombine'
 	)
 
 PROTOCOLS_IDS = {k:v for k, v in zip(PROTOCOLS, range(1,len(PROTOCOLS)+1))}

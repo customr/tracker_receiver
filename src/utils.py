@@ -68,8 +68,8 @@ def unpack_from_bytes(fmt, packet):
 def pack(packet):
 	return binascii.a2b_hex(packet)
 
-def add_x(packet, letter, value):
-	new_part = binascii.hexlify(struct.pack(f'!{letter}', value)).decode('ascii')
+def add_x(packet, letter, value, endiannes='!'):
+	new_part = binascii.hexlify(struct.pack(f'{endiannes}{letter}', value)).decode('ascii')
 	packet = packet+new_part
 	return packet
 
@@ -79,29 +79,29 @@ def add_str(packet, string):
 
 	return add_x(packet, f'{len(string)}s', string)
 
-def add_byte(packet, value):
-	return add_x(packet, 'b', value)
+def add_byte(packet, value, endiannes='!'):
+	return add_x(packet, 'b', value, endiannes=endiannes)
 
-def add_ubyte(packet, value):
-	return add_x(packet, 'B', value)
+def add_ubyte(packet, value, endiannes='!'):
+	return add_x(packet, 'B', value, endiannes=endiannes)
 
-def add_short(packet, value):
-	return add_x(packet, 'h', value)
+def add_short(packet, value, endiannes='!'):
+	return add_x(packet, 'h', value, endiannes=endiannes)
 
-def add_ushort(packet, value):
-	return add_x(packet, 'H', value)
+def add_ushort(packet, value, endiannes='!'):
+	return add_x(packet, 'H', value, endiannes=endiannes)
 
-def add_int(packet, value):
-	return add_x(packet, 'i', value)
+def add_int(packet, value, endiannes='!'):
+	return add_x(packet, 'i', value, endiannes=endiannes)
 
-def add_uint(packet, value):
-	return add_x(packet, 'I', value)
+def add_uint(packet, value, endiannes='!'):
+	return add_x(packet, 'I', value, endiannes=endiannes)
 
-def add_longlong(packet, value):
-	return add_x(packet, 'q', value)
+def add_longlong(packet, value, endiannes='!'):
+	return add_x(packet, 'q', value, endiannes=endiannes)
 
-def add_float(packet, value):
-	return add_x(packet, 'f', value)
+def add_float(packet, value, endiannes='!'):
+	return add_x(packet, 'f', value, endiannes=endiannes)
 
-def add_double(packet, value):
-	return add_x(packet, 'd', value)
+def add_double(packet, value, endiannes='!'):
+	return add_x(packet, 'd', value, endiannes=endiannes)
