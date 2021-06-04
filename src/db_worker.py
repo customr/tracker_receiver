@@ -1,4 +1,4 @@
-import pymysql
+﻿import pymysql
 
 from json import loads, load
 from contextlib import closing
@@ -12,7 +12,8 @@ PROTOCOLS = (
 	'teltonika',
 	'wialon',
 	'adm',
-	'ion'
+	'ion',
+    'wialoncombine'
 	)
 
 PROTOCOLS_IDS = {k:v for k, v in zip(PROTOCOLS, range(1,len(PROTOCOLS)+1))}
