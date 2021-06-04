@@ -143,7 +143,7 @@ class ION:
 
         packet, AIN = extract_ushort(packet)
         packet, VOLTAGE = extract_ushort(packet)
-        packet, TEMP = extract_ubyte(packet)
+        packet, TEMP = extract_byte(packet)
 
         packet, day = extract_ubyte(packet)
         packet, month = extract_ubyte(packet)

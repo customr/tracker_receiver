@@ -168,6 +168,8 @@ class ADM:
     @staticmethod
     def get_tracker(imei):
         for t in ADM.TRACKERS:
+            if not hasattr(t, 'imei'):
+                continue
             if str(t.imei)==str(imei):
                 return t
 

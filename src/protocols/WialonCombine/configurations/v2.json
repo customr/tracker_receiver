@@ -1,0 +1,26 @@
+{
+	"ADC1": "voltage",
+	"FUEL1": "fuel_S",
+	"FUEL2": "fuel_S2",
+	"FUEL3": "fuel_S3",
+	"FUEL8": "fuel_S",
+	"FUEL9": "fuel_S2",
+	"FUEL10": "fuel_S3",
+	"param11": "odom",
+	"param16": "X",
+	"param17": "Y",
+	"param18": "Z",
+	"param7": "gsm",
+
+	
+	"TEMP8": "temp",
+	"TEMP30": "temp",
+	"TEMP16": "temp",
+
+
+	"CAN32": "RPM",
+	"CAN33": "temp_4",
+	"CAN34": "fuel_used*0.00000001",
+	"CAN36": "fuel_level_L",
+	"CAN35": "odom*1000"
+}

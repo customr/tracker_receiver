@@ -11,6 +11,7 @@ from src.protocols.Teltonika import Teltonika
 from src.protocols.Wialon import Wialon
 from src.protocols.ADM import ADM
 from src.protocols.ION import ION
+from src.protocols.WialonCombine import WialonCombine
 from src.logs.log_config import logger
 
 protocols = {
@@ -18,6 +19,7 @@ protocols = {
 	'wialon': Wialon.Wialon,
 	'adm': ADM.ADM,
 	'ion': ION.ION,
+	'wialoncombine': WialonCombine.WialonCombine
 }
 
 
@@ -35,37 +37,47 @@ async def handler(ws, path):
 				teltonika = Teltonika.Teltonika.get_tracker(rec['imei'])
 				adm = ADM.ADM.get_tracker(rec['imei'])
 				ion = ION.ION.get_tracker(rec['imei'])
-				if any([teltonika, adm, ion]):
-					if teltonika:
-						tracker = teltonika
-					elif adm:
-						tracker = adm
-					elif ion:
-						tracker = ion
+				wialoncombine = WialonCombine.WialonCombine.get_tracker(rec['imei'])
+				if any([teltonika, adm, ion, wialoncombine]):
 
 					logger.debug(f"WEBSOCKET tracker {rec['imei']} found")
 					if teltonika:
-						Teltonika.Teltonika.send_command(tracker, int(rec['codec']), rec['command'])
+						teltonika.command_response = {}
+						teltonika.send_command(int(rec['codec']), rec['command'])
+						for _ in range(10):
+							sleep(2)
+							if teltonika.command_response!={}:
+								command_response = teltonika.command_response
 					elif adm:
-						ADM.ADM.send_command(tracker, rec['command'])
+						adm.command_response = {}
+						adm.send_command(rec['command'])
+						for _ in range(10):
+							sleep(2)
+							if adm.command_response!={}:
+								command_response = adm.command_response
 					elif ion:
-						ION.ION.send_command(tracker, rec['command'])
+						ion.command_response = {}
+						ion.send_command(rec['command'])
+						for _ in range(10):
+							sleep(2)
+							if ion.command_response!={}:
+								command_response = ion.command_response
+					elif wialoncombine:
+						wialoncombine.command_response = {}
+						wialoncombine.send_command(rec['command'])
+						for _ in range(10):
+							sleep(2)
+							if wialoncombine.command_response!={}:
+								command_response = wialoncombine.command_response
+					
 
-					logger.info(f"WEBSOCKET {rec['imei']} command {rec['command']} sent")
-
-					for _ in range(10):
-						sleep(2)
-						if tracker.command_response!={}:
-							break
-
-					if tracker.command_response!={}:
-						logger.debug(f'WEBSOCKET command response\n{tracker.command_response}')
+					if command_response!={}:
+						logger.debug(f'WEBSOCKET command response\n{command_response}')
 						try:
-							await ws.send(tracker.command_response)
+							await ws.send(command_response)
 						except Exception as e:
 							logger.error(f"WEBSOCKET ошибка при отправке ответа {e}")
 
-						tracker.command_response = {}
 					else:
 						await ws.send(dumps({"action":"response", "result": "Время ожидания ответа истекло"}))
 
@@ -78,8 +90,7 @@ async def handler(ws, path):
 				continue
 
 		except Exception as e:
-			logger.info(e)
-			break
+			raise e
 
 
 
