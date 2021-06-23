@@ -461,7 +461,7 @@ class WialonCombine:
         reserve = str(reserve).replace("'", '"')
         reserve = reserve.replace(' ', '')[1:-1]
 
-        if self.assign.get('sensor', True):
+        if str(self.assign.get('sensor', 'true')).lower() == 'true':
             sensor = data.get('IN_0', 0)
         else:
             sensor = 0   

@@ -1,5 +1,5 @@
 {
-	"sensor": true,
+	"sensor": "true",
 	"ADC1": "voltage",
 	"FUEL1": "fuel_S",
 	"FUEL2": "fuel_S2",
