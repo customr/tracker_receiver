@@ -78,6 +78,7 @@ class WialonCombine:
             logger.debug(f'[WialonCombine] получен пакет:\n{packet}\n')
             
             count = 0
+            command = False
             packet, packet_header = self.handle_header(packet)
             if packet_header['type']==0:
                 try:
@@ -92,20 +93,41 @@ class WialonCombine:
                 while len(packet)>4:
                     try:
                         packet, packet_data, packet_reserve = self.handle_data(packet)
-                        for data in packet_data:
-                            self.data, _ = self.prepare_data(packet_reserve, data)
-                            c = insert_geo([self.data])
-                            count += 1
                     except Exception as e:
+                        logger.debug(f'[WialonCombine] error parsing {packet} {str(e)}\n')
                         break
-            else:
+                    
+                    if packet_reserve.get('DRIVERMESSAGE'):
+                        command = True
+                    else:
+                        command = False
+                        
+                    if not packet_data and packet_reserve:
+                        packet_data.append({
+                            "lat": 0,
+                            "lon": 0,
+                            "timestamp": int(time()),
+                            "speed": 0,
+                            "direction": 0,
+                        })
+                    for data in packet_data:
+                        self.data, _ = self.prepare_data(packet_reserve, data)
+                        c = insert_geo([self.data])
+                        count += 1
+            elif packet_header['type']==2:
                 continue
-            
-            self.success = True
+            else:
+                logger.debug(f"[WialonCombine] unknown type {packet} {packet_header['type']}\n")
+                self.success = False
+                
             if self.success:
                 resp = ''
                 resp = add_short(resp, 0x4040, '>')
-                resp = add_byte(resp, 0x00, '>')
+                if not command:
+                    resp = add_byte(resp, 0x00, '>')
+                else:
+                    resp = add_byte(resp, 255, '>')
+                    
                 resp = add_ushort(resp, self.pid, '>')
                 logger.debug(f'[WialonCombine] {self.imei} response to tracker:\n{resp}\n')
                 resp = pack(resp)
@@ -205,6 +227,12 @@ class WialonCombine:
                 for _ in range(count):
                     packet, uid, value = self.handle_param(packet)
                     packet_reserve[f'DRIVER{uid}'] = value
+            elif type==12:
+                packet, msg = extract_str(packet, (len(packet)-6)//2, '!')
+                msg = msg.decode()
+                resp = {"action":"response", "result": msg}
+                self.command_response = dumps(resp)
+                packet_reserve[f'DRIVERMESSAGE'] = msg
             else:
                 logger.error(f'[WialonCombine] idk')
                 self.success = False
@@ -261,7 +289,7 @@ class WialonCombine:
 
     def handle_param(self, packet):
         packet, uid = self.get_extended_value_ushort(packet)
-        packet, temp = extract_byte(packet, '>')
+        packet, temp = extract_ubyte(packet, '>')
         type_sensor = temp & 0x1f
         divisor_degree = temp>>5
         if type_sensor==0:
@@ -350,12 +378,8 @@ class WialonCombine:
         packet = pack(packet)
         try:
             self.sock.send(packet)
-            resp = {"action":"response", "result": 'true'}
-            self.command_response = dumps(resp)
             logger.info(f'[WialonCombine]  команда {command} отправлена\n') 
         except Exception as e:
-            resp = {"action":"response", "result": 'false'}
-            self.command_response = dumps(resp)
             logger.error(f'[WialonCombine]  команда {command} не отправлена {str(e)}\n') 
 
     @staticmethod
@@ -390,20 +414,26 @@ class WialonCombine:
         data = self.assign_data(header)
 
         if self.model=='v1':
-            if data['IN_4']&0x2:
-                data['ignition'] = 1
+            if data.get('IN_4'):
+                if data['IN_4']&0x2:
+                    data['ignition'] = 1
+                else:
+                    data['ignition'] = 0
             else:
                 data['ignition'] = 0
         else:
-            if data['IN_4']&0x1:
-                data['ignition'] = 1
+            if data.get('IN_4'):
+                if data['IN_4']&0x1:
+                    data['ignition'] = 1
+                else:
+                    data['ignition'] = 0
+                    
+                if data['IN_4']&0x2:
+                    data['IN_0'] = 1
+                else:
+                    data['IN_0'] = 0
             else:
                 data['ignition'] = 0
-                
-            if data['IN_4']&0x2:
-                data['IN_0'] = 1
-            else:
-                data['IN_0'] = 0
                 
 
         for k in ('fuel_S', 'RPM', 'temp_4', 'param1', 'param2', 'param3', 'gsm', 'X', 'Y', 'Z', 'odom'):
@@ -415,6 +445,8 @@ class WialonCombine:
                 data['output_1'] = 1
             else:
                 data['output_1'] = 0
+        
+        data['sat_num'] = data.get('param2', 0) + data.get('param3', 0)
         
         if data.get('fuel_used'):
             data['fuel_used'] = round(data['fuel_used'], 1)
@@ -429,6 +461,11 @@ class WialonCombine:
         reserve = str(reserve).replace("'", '"')
         reserve = reserve.replace(' ', '')[1:-1]
 
+        if self.assign.get('sensor', True):
+            sensor = data.get('IN_0', 0)
+        else:
+            sensor = 0   
+
         if data.get('posinfo'):
             insert = 1
             data = {
@@ -442,7 +479,7 @@ class WialonCombine:
                 "bat": 0,
                 "fuel": 0,
                 "ignition": data['ignition'],
-                "sensor": data.get('IN_0', 0),
+                "sensor": sensor,
                 "reserve": reserve,
                 "ts": datetime.utcfromtimestamp(int(time()))
             }

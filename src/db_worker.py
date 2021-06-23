@@ -4,6 +4,7 @@ from json import loads, load
 from contextlib import closing
 
 from src.db_connect import CONN, RECORDS_TABLE
+from src.logs.log_config import logger
 
 GEO_COLUMNS = '`imei`,`lat`,`lon`,`datetime`,`type`,`speed`,`direction`,`bat`,`fuel`,'
 GEO_COLUMNS += '`ignition`,`sensor`,`reserve`, `ts`'
@@ -65,30 +66,35 @@ def get_configuration(protocol_name, imei, d_model=None):
 
 
 def insert_geo(data, debug=False):
-	with closing(pymysql.connect(**CONN)) as connection:
-		count = 0
-		for rec in data:
-			if not debug:
-				query = f'INSERT INTO `{RECORDS_TABLE}` ({GEO_COLUMNS}) VALUES ('
-			else:
-				query = f'INSERT INTO `geo_test` ({GEO_COLUMNS}) VALUES ('
-
-			for name, value in rec.items():
-				if name in ('datetime', 'reserve', 'ts'):
-					query += f"'{value}',"
+    try:
+		with closing(pymysql.connect(**CONN)) as connection:
+			count = 0
+			for rec in data:
+				if not debug:
+					query = f'INSERT INTO `{RECORDS_TABLE}` ({GEO_COLUMNS}) VALUES ('
 				else:
-					query += f"{value},"
+					query = f'INSERT INTO `geo_test` ({GEO_COLUMNS}) VALUES ('
 
-			query = query[:-1]
-			query += ')'
-			with connection.cursor() as cursor:
-				try:
-					cursor.execute(query)
-					count += 1
-				except Exception as e:
-					with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
-						fd.write(f'Ошибка в mysql insert запросе {e}\n')
+				for name, value in rec.items():
+					if name in ('datetime', 'reserve', 'ts'):
+						query += f"'{value}',"
+					else:
+						query += f"{value},"
 
-			connection.commit()
+				query = query[:-1]
+				query += ')'
+				with connection.cursor() as cursor:
+					try:
+						cursor.execute(query)
+						count += 1
+					except Exception as e:
+						with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
+							fd.write(f'Ошибка в mysql insert запросе {e}\nimei: {rec["imei"]}\n{rec}\n')
 
-	return count
+				connection.commit()
+
+		return count
+	except Exception as e:
+		with open('tracker_receiver/src/logs/errors.log', 'a') as fd:
+			fd.write(f'Ошибка в отправке {str(e)}\nimei: {rec["imei"]}\n{rec}\n')
+		logger.exception(e)

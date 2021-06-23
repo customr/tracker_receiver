@@ -58,6 +58,7 @@ class ADM:
                 self.handle_packet()
             except Exception as e:
                 self.close()
+                logger.error('ADM ERROR {e}')
                 raise e
 
 
@@ -106,16 +107,13 @@ class ADM:
 
         while not self.stop:
             self.msg_type = 0
-            try:
+            
+            packet = binascii.hexlify(self.sock.recv(1024))
+            if len(packet)==4:
                 packet = binascii.hexlify(self.sock.recv(1024))
-                if len(packet)==4:
-                    packet = binascii.hexlify(self.sock.recv(1024))
-                if len(packet)==0:
-                    continue
+            if len(packet)==0:
+                continue
 
-            except Exception as e:
-                self.close()
-                break
 
             logger.debug(f'[ADM{self.model}] {self.imei} принят пакет {packet}')
 
@@ -140,7 +138,7 @@ class ADM:
                 logger.debug(f'[ADM{self.model}] {self.imei} данные после обработки: {data}')
                 all_data.append(data)
 
-            if not packet is None:
+            if all_data:
                 count = insert_geo(all_data)
                 logger.info(f'ADM{self.model} {self.imei} принято {count}/{len(all_data)} записей')
                 if self.need_reply==1:
@@ -168,8 +166,6 @@ class ADM:
     @staticmethod
     def get_tracker(imei):
         for t in ADM.TRACKERS:
-            if not hasattr(t, 'imei'):
-                continue
             if str(t.imei)==str(imei):
                 return t
 

@@ -39,36 +39,40 @@ async def handler(ws, path):
 				ion = ION.ION.get_tracker(rec['imei'])
 				wialoncombine = WialonCombine.WialonCombine.get_tracker(rec['imei'])
 				if any([teltonika, adm, ion, wialoncombine]):
-
+					command_response = dumps({})
 					logger.debug(f"WEBSOCKET tracker {rec['imei']} found")
 					if teltonika:
 						teltonika.command_response = {}
 						teltonika.send_command(int(rec['codec']), rec['command'])
-						for _ in range(10):
-							sleep(2)
+						for _ in range(30):
+							sleep(0.5)
 							if teltonika.command_response!={}:
 								command_response = teltonika.command_response
+								break
 					elif adm:
 						adm.command_response = {}
 						adm.send_command(rec['command'])
-						for _ in range(10):
-							sleep(2)
+						for _ in range(30):
+							sleep(0.5)
 							if adm.command_response!={}:
 								command_response = adm.command_response
+								break
 					elif ion:
 						ion.command_response = {}
 						ion.send_command(rec['command'])
-						for _ in range(10):
-							sleep(2)
+						for _ in range(30):
+							sleep(0.5)
 							if ion.command_response!={}:
 								command_response = ion.command_response
+								break
 					elif wialoncombine:
 						wialoncombine.command_response = {}
 						wialoncombine.send_command(rec['command'])
-						for _ in range(10):
-							sleep(2)
+						for _ in range(30):
+							sleep(0.5)
 							if wialoncombine.command_response!={}:
 								command_response = wialoncombine.command_response
+								break
 					
 
 					if command_response!={}:
